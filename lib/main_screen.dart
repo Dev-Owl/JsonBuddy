@@ -48,6 +48,7 @@ class _MainScreenState extends State<MainScreen> {
                 backgroundColor: Colors.red[300],
               );
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              //TODO(CM): Mark the related text part red
             }
           }),
     );
