@@ -17,6 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     controller = TextEditingController();
+    controller.text = '{"name":"John", "age" 30, "car":null}';
   }
 
   @override
@@ -37,9 +38,17 @@ class _MainScreenState extends State<MainScreen> {
           ),
           onPressed: () {
             const decoder = JsonDecoder();
-            final model = decoder.convert(controller.text);
-            const encoder = JsonEncoder.withIndent('  ');
-            controller.text = encoder.convert(model);
+            try {
+              final model = decoder.convert(controller.text);
+              const encoder = JsonEncoder.withIndent('  ');
+              controller.text = encoder.convert(model);
+            } on FormatException catch (ex) {
+              final snackBar = SnackBar(
+                content: Text(ex.message),
+                backgroundColor: Colors.red[300],
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
           }),
     );
   }
