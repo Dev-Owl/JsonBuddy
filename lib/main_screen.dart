@@ -44,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
               controller.text = encoder.convert(model);
             } on FormatException catch (ex) {
               final snackBar = SnackBar(
-                content: Text(ex.message),
+                content: Text(ex.toString()),
                 backgroundColor: Colors.red[300],
               );
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
