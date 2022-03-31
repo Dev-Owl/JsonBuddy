@@ -6,7 +6,9 @@ import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 class LineNumberTextField extends StatefulWidget {
   final TextEditingController textEditingController;
-  const LineNumberTextField({required this.textEditingController, Key? key})
+  final FormatException? currentError;
+  const LineNumberTextField(
+      {required this.textEditingController, this.currentError, Key? key})
       : super(key: key);
 
   @override
@@ -99,7 +101,13 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
     );
 
     return Container(
-      decoration: BoxDecoration(border: Border.all()),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: widget.currentError != null
+              ? Colors.red
+              : const Color(0xFFf0f0f0),
+        ),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -107,6 +115,7 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
             width: 50,
             padding: const EdgeInsets.only(left: 3),
             child: lineNumberCol,
+            height: double.infinity,
             decoration: const BoxDecoration(
               border: Border(
                 right: BorderSide(),
