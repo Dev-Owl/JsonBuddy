@@ -68,6 +68,10 @@ class _MainScreenState extends State<MainScreen> {
       JsonBuddyShortcut.search,
       searchHotkeyCallback,
     );
+    GlobalConfig.shortCutProvider.addSearchListner(
+      JsonBuddyShortcut.validateCode,
+      _tryparse,
+    );
   }
 
   @override
@@ -75,6 +79,10 @@ class _MainScreenState extends State<MainScreen> {
     GlobalConfig.shortCutProvider.removeSearchListner(
       JsonBuddyShortcut.search,
       searchHotkeyCallback,
+    );
+    GlobalConfig.shortCutProvider.removeSearchListner(
+      JsonBuddyShortcut.validateCode,
+      _tryparse,
     );
     super.dispose();
   }

@@ -45,7 +45,11 @@ class _MyAppState extends State<MyApp> {
           control: true,
         ): () => GlobalConfig.shortCutProvider.triggerShortcut(
               JsonBuddyShortcut.search,
-            )
+            ),
+        const SingleActivator(LogicalKeyboardKey.enter, control: true): () =>
+            GlobalConfig.shortCutProvider.triggerShortcut(
+              JsonBuddyShortcut.validateCode,
+            ),
       },
       child: MaterialApp(
         title: 'JSON Buddy',
