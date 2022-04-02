@@ -1,7 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:json_buddy/global.dart';
+import 'package:json_buddy/helper/debouncer.dart';
+import 'package:json_buddy/helper/json_formater.dart';
+import 'package:json_buddy/helper/short_cut_provider.dart';
+import 'package:json_buddy/json_controller.dart';
 import 'package:json_buddy/line_number_text_field.dart';
+import 'package:json_path/json_path.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -10,53 +16,88 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-//TODO(CM): The textfield has to create the controller
-/*          The error must below the textfield
-            The error part in the text should be marked red
-            The serach needs to be implemented
-*/
-
 class _MainScreenState extends State<MainScreen> {
-  late final TextEditingController controller;
-  bool showSearchInAppBar = false;
+  /// Controller for the main text in the application
+  late final JsonController jsonController;
+
+  late final TextEditingController searchController;
+
+  late final JsonController filteredTextController;
+
+  /// Tracks if we want to show the search in the appbar
+  bool searchModeActive = false;
+
+  /// Last error that has ocoured for parsing provided JSON
   FormatException? lastError;
+
+  /// The current model parsed from json, if any otherwise null
+  dynamic currentParsedModel;
+
+  /// Used to debounce search requests
+  final debouncer = Debouncer();
+
+  /// Filter syntax error indicator
+  bool filterSyntaxError = false;
+
+  /// Format JSON even with syntax errors
+  final JsonFormater anyWayFormat = JsonFormater();
+
+  /// Focus node for the search input
+  final searchFocusNode = FocusNode();
+
+  late final VoidCallback searchHotkeyCallback;
+
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController();
-    controller.text = '{"name":"John", "age" 30, "car":null}';
+    jsonController = JsonController();
+    jsonController.text = '{"name":"John", "age": 30, "car":null}';
+
+    filteredTextController = JsonController();
+
+    searchController = TextEditingController(text: "\$.*");
+    searchController.addListener(() {
+      debouncer(() {
+        _applySearch();
+      });
+    });
+    searchHotkeyCallback = () => _setSearchMode(!searchModeActive);
+    GlobalConfig.shortCutProvider.addSearchListner(
+      JsonBuddyShortcut.search,
+      searchHotkeyCallback,
+    );
+  }
+
+  @override
+  void dispose() {
+    GlobalConfig.shortCutProvider.removeSearchListner(
+      JsonBuddyShortcut.search,
+      searchHotkeyCallback,
+    );
+    super.dispose();
+  }
+
+  void _setSearchMode(bool newMode) {
+    setState(() {
+      searchModeActive = newMode;
+      if (searchModeActive) {
+        searchFocusNode.requestFocus();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _createAppBar(),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: LineNumberTextField(
-              textEditingController: controller,
-              currentError: lastError,
-            ),
-          ),
-          if (lastError != null)
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Container(
-                color: Colors.red,
-                width: double.infinity,
-                margin: const EdgeInsets.all(5),
-                padding: const EdgeInsets.only(
-                  top: 10,
-                ),
-                child: Text(
-                  lastError.toString(),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(5),
+        child: LineNumberTextField(
+          filteredTextEditingController: filteredTextController,
+          textEditingController: jsonController,
+          currentError: lastError,
+          displayFilterView: searchModeActive,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(
@@ -65,13 +106,21 @@ class _MainScreenState extends State<MainScreen> {
         onPressed: () {
           const decoder = JsonDecoder();
           try {
-            final model = decoder.convert(controller.text);
+            jsonController.text = anyWayFormat.formatText(jsonController.text);
+            currentParsedModel = decoder.convert(jsonController.text);
             const encoder = JsonEncoder.withIndent('  ');
-            controller.text = encoder.convert(model);
+            jsonController.text = encoder.convert(currentParsedModel);
+            if (searchModeActive) {
+              _applySearch();
+            }
+            jsonController.formatError(null);
             setState(() {
               lastError = null;
             });
           } on FormatException catch (ex) {
+            currentParsedModel = null;
+            jsonController.formatError(ex);
+            _applySearch();
             setState(() {
               lastError = ex;
             });
@@ -84,22 +133,25 @@ class _MainScreenState extends State<MainScreen> {
   AppBar _createAppBar() {
     late Widget child;
     List<Widget> actions = [];
-    if (showSearchInAppBar) {
-      child = Container(
+    if (searchModeActive) {
+      child = SizedBox(
         width: double.infinity,
         height: 40,
-        color: Colors.white,
         child: Center(
           child: TextField(
+            focusNode: searchFocusNode,
+            controller: searchController,
             decoration: InputDecoration(
                 hintText: 'Search for something using JsonPath',
                 prefixIcon: const Icon(Icons.search),
+                filled: filterSyntaxError,
+                fillColor: filterSyntaxError
+                    ? const Color.fromARGB(255, 219, 63, 52)
+                    : null,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {
-                    setState(() {
-                      showSearchInAppBar = false;
-                    });
+                    _setSearchMode(false);
                   },
                 )),
           ),
@@ -110,9 +162,7 @@ class _MainScreenState extends State<MainScreen> {
       actions.add(
         IconButton(
           onPressed: () {
-            setState(() {
-              showSearchInAppBar = true;
-            });
+            _setSearchMode(true);
           },
           icon: const Icon(Icons.search),
         ),
@@ -122,5 +172,29 @@ class _MainScreenState extends State<MainScreen> {
       title: child,
       actions: actions,
     );
+  }
+
+  void _applySearch() {
+    if (currentParsedModel != null) {
+      late final JsonPath jsonPath;
+      try {
+        jsonPath = JsonPath(searchController.text);
+      } catch (ex) {
+        filteredTextController.text = "";
+        setState(() {
+          filterSyntaxError = true;
+        });
+        return;
+      }
+      setState(() {
+        filterSyntaxError = false;
+      });
+      final matchedResult = jsonPath.read(currentParsedModel);
+      final values = matchedResult.map((match) => match.value).toList();
+      final encoder = JsonEncoder.withIndent(GlobalConfig.indent);
+      filteredTextController.text = encoder.convert(values);
+    } else {
+      filteredTextController.text = "";
+    }
   }
 }

@@ -1,14 +1,23 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_highlight/theme_map.dart';
+import 'package:json_buddy/global.dart';
 import 'package:json_buddy/line_number_controller.dart';
+import 'package:json_buddy/syntax_error.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 class LineNumberTextField extends StatefulWidget {
   final TextEditingController textEditingController;
   final FormatException? currentError;
+  final bool displayFilterView;
+  final TextEditingController filteredTextEditingController;
   const LineNumberTextField(
-      {required this.textEditingController, this.currentError, Key? key})
+      {required this.textEditingController,
+      required this.filteredTextEditingController,
+      this.currentError,
+      this.displayFilterView = false,
+      Key? key})
       : super(key: key);
 
   @override
@@ -16,11 +25,18 @@ class LineNumberTextField extends StatefulWidget {
 }
 
 class _LineNumberTextFieldState extends State<LineNumberTextField> {
+  static const _defaultFontFamily = 'monospace';
+  static const _rootKey = 'root';
+  static const _defaultFontColor = Color(0xff000000);
+  static const _defaultBackgroundColor = Color(0xffffffff);
+
   LineNumberController? _lineNumberController;
 
-  ScrollController? _scrollController;
+  ScrollController? _scrollControllerLineNumbers;
 
-  ScrollController? _scrollController1;
+  ScrollController? _scrollControllerJson;
+
+  ScrollController? _scrollControllerJsonFiltered;
 
   LinkedScrollControllerGroup? _controllers;
 
@@ -35,8 +51,9 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
 
     _controllers = LinkedScrollControllerGroup();
 
-    _scrollController = _controllers?.addAndGet();
-    _scrollController1 = _controllers?.addAndGet();
+    _scrollControllerLineNumbers = _controllers?.addAndGet();
+    _scrollControllerJson = _controllers?.addAndGet();
+    _scrollControllerJsonFiltered = _controllers?.addAndGet();
   }
 
   // Wrap the codeField in a horizontal scrollView
@@ -60,7 +77,13 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
               padding: const EdgeInsets.only(right: 16.0),
             ), // Add extra padding
           ),
-          Expanded(child: codeField),
+          Expanded(
+              child: Container(
+            color:
+                themeMap[GlobalConfig.codeTheme]![_rootKey]?.backgroundColor ??
+                    _defaultBackgroundColor,
+            child: codeField,
+          )),
         ],
       ),
     );
@@ -74,38 +97,81 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = TextStyle(
+      fontFamily: _defaultFontFamily,
+      color: themeMap[GlobalConfig.codeTheme]![_rootKey]?.color ??
+          _defaultFontColor,
+    );
     final lineNumberCol = TextField(
       controller: _lineNumberController,
       enabled: false,
       maxLines: null,
-      scrollController: _scrollController,
+      style: textStyle,
+      scrollController: _scrollControllerLineNumbers,
       decoration: const InputDecoration(
         disabledBorder: InputBorder.none,
       ),
     );
 
-    final field = LayoutBuilder(
+    final jsonField = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         // Control horizontal scrolling
         return _wrapInScrollView(
-            TextField(
-              controller: widget.textEditingController,
-              scrollController: _scrollController1,
-              maxLines: null,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-              ),
+          TextField(
+            controller: widget.textEditingController,
+            scrollController: _scrollControllerJson,
+            maxLines: null,
+            style: textStyle,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
             ),
-            constraints.maxWidth);
+          ),
+          constraints.maxWidth,
+        );
       },
     );
+
+    final filteredField = LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        // Control horizontal scrolling
+        return _wrapInScrollView(
+          TextField(
+            readOnly: true,
+            controller: widget.filteredTextEditingController,
+            scrollController: _scrollControllerJsonFiltered,
+            maxLines: null,
+            style: textStyle,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+            ),
+          ),
+          constraints.maxWidth,
+        );
+      },
+    );
+
+    final contentChild = widget.displayFilterView
+        ? Row(
+            children: [
+              Expanded(
+                child: jsonField,
+              ),
+              Container(
+                width: 5,
+              ),
+              Expanded(
+                child: filteredField,
+              ),
+            ],
+          )
+        : jsonField;
 
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
           color: widget.currentError != null
               ? Colors.red
-              : const Color(0xFFf0f0f0),
+              : const Color.fromARGB(255, 0, 0, 0),
         ),
       ),
       child: Row(
@@ -116,17 +182,27 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
             padding: const EdgeInsets.only(left: 3),
             child: lineNumberCol,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              border: Border(
+            decoration: BoxDecoration(
+              color: themeMap[GlobalConfig.codeTheme]![_rootKey]
+                      ?.backgroundColor ??
+                  _defaultBackgroundColor,
+              border: const Border(
                 right: BorderSide(),
               ),
-              color: Color(0xFFf0f0f0),
             ),
           ),
           const SizedBox(
-            width: 5,
+            width: 1,
           ),
-          Expanded(child: field),
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(child: contentChild),
+                if (widget.currentError != null)
+                  SyntaxError(widget.currentError!)
+              ],
+            ),
+          ),
         ],
       ),
     );
