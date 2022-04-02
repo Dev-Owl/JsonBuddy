@@ -11,13 +11,13 @@ class LineNumberController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
+    final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
     final children = <TextSpan>[];
     final list = text.split('\n');
     const themeClassToUse = 'root';
     for (var k = 0; k < list.length; k++) {
       final textSpan = TextSpan(
-          text: '${k + 1}',
-          style: themeMap[GlobalConfig.codeTheme]![themeClassToUse]);
+          text: '${k + 1}', style: themeMap[themeToUse]![themeClassToUse]);
       children.add(textSpan);
       if (k < list.length - 1) children.add(const TextSpan(text: '\n'));
     }

@@ -51,6 +51,7 @@ class JsonController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
+    final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
     final syntaxNodes = highlight.parse(
       text,
       language: 'json',
@@ -62,11 +63,11 @@ class JsonController extends TextEditingController {
       final list = text.split('\n');
       for (var i = 0; i < list.length; ++i) {
         final childStyle = errorPresent && i == errorLine
-            ? themeMap[GlobalConfig.codeTheme]!['root']!.copyWith(
+            ? themeMap[themeToUse]!['root']!.copyWith(
                 color: Colors.red,
                 backgroundColor: const Color(0xFFfbe3e4),
               )
-            : themeMap[GlobalConfig.codeTheme]!['root'];
+            : themeMap[themeToUse]!['root'];
 
         children.add(TextSpan(
           text: "${list[i]}\n",
@@ -83,7 +84,7 @@ class JsonController extends TextEditingController {
     List<TextSpan> spans = [];
     var currentSpans = spans;
     List<List<TextSpan>> stack = [];
-
+    final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
     _traverse(Node node) {
       if (node.value != null) {
         currentSpans.add(
@@ -91,7 +92,7 @@ class JsonController extends TextEditingController {
               ? TextSpan(text: node.value)
               : TextSpan(
                   text: node.value,
-                  style: themeMap[GlobalConfig.codeTheme]![node.className!],
+                  style: themeMap[themeToUse]![node.className!],
                 ),
         );
       } else if (node.children != null) {
@@ -99,7 +100,7 @@ class JsonController extends TextEditingController {
         currentSpans.add(
           TextSpan(
             children: tmp,
-            style: themeMap[GlobalConfig.codeTheme]![node.className!],
+            style: themeMap[themeToUse]![node.className!],
           ),
         );
         stack.add(currentSpans);

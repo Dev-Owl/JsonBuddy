@@ -57,7 +57,8 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
   }
 
   // Wrap the codeField in a horizontal scrollView
-  Widget _wrapInScrollView(Widget codeField, double minWidth) {
+  Widget _wrapInScrollView(
+      Widget codeField, double minWidth, String themeToUse) {
     const leftPad = 0.0;
     final longestLine = widget.textEditingController.text
         .split('\n')
@@ -79,9 +80,8 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
           ),
           Expanded(
               child: Container(
-            color:
-                themeMap[GlobalConfig.codeTheme]![_rootKey]?.backgroundColor ??
-                    _defaultBackgroundColor,
+            color: themeMap[themeToUse]![_rootKey]?.backgroundColor ??
+                _defaultBackgroundColor,
             child: codeField,
           )),
         ],
@@ -97,10 +97,10 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
     final textStyle = TextStyle(
       fontFamily: _defaultFontFamily,
-      color: themeMap[GlobalConfig.codeTheme]![_rootKey]?.color ??
-          _defaultFontColor,
+      color: themeMap[themeToUse]![_rootKey]?.color ?? _defaultFontColor,
     );
     final lineNumberCol = TextField(
       controller: _lineNumberController,
@@ -127,6 +127,7 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
             ),
           ),
           constraints.maxWidth,
+          themeToUse,
         );
       },
     );
@@ -146,6 +147,7 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
             ),
           ),
           constraints.maxWidth,
+          themeToUse,
         );
       },
     );
@@ -166,45 +168,34 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
           )
         : jsonField;
 
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: widget.currentError != null
-              ? Colors.red
-              : const Color.fromARGB(255, 0, 0, 0),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 50,
+          padding: const EdgeInsets.only(left: 3),
+          child: lineNumberCol,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: themeMap[themeToUse]![_rootKey]?.backgroundColor ??
+                _defaultBackgroundColor,
+            border: const Border(
+              right: BorderSide(),
+            ),
+          ),
         ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 50,
-            padding: const EdgeInsets.only(left: 3),
-            child: lineNumberCol,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: themeMap[GlobalConfig.codeTheme]![_rootKey]
-                      ?.backgroundColor ??
-                  _defaultBackgroundColor,
-              border: const Border(
-                right: BorderSide(),
-              ),
-            ),
+        const SizedBox(
+          width: 1,
+        ),
+        Expanded(
+          child: Column(
+            children: [
+              Expanded(child: contentChild),
+              if (widget.currentError != null) SyntaxError(widget.currentError!)
+            ],
           ),
-          const SizedBox(
-            width: 1,
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                Expanded(child: contentChild),
-                if (widget.currentError != null)
-                  SyntaxError(widget.currentError!)
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

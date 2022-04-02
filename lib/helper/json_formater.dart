@@ -1,8 +1,9 @@
 import 'package:json_buddy/global.dart';
 
 class JsonFormater {
-  String formatText(String input, {String? defaultIndent}) {
-    final indentToUse = defaultIndent ?? GlobalConfig.indent;
+  String formatText(String input) {
+    final indent = (prefs.getInt(settingIndent) ?? 2);
+    final indentToUse = '' * indent;
     var formatedResult = '';
     var currentLevel = 0;
     var inQuotes = false;

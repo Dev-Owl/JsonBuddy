@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:json_buddy/theme.dart';
 
 class SyntaxError extends StatelessWidget {
   final FormatException lastError;
@@ -9,7 +10,7 @@ class SyntaxError extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomLeft,
       child: Container(
-        color: Colors.red,
+        color: errorColor,
         width: double.infinity,
         padding: const EdgeInsets.only(
           top: 10,
