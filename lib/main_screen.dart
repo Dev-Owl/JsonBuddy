@@ -4,6 +4,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:json_buddy/helper/global.dart';
 import 'package:json_buddy/helper/debouncer.dart';
+import 'package:json_buddy/helper/globalization.dart';
 import 'package:json_buddy/helper/json_formater.dart';
 import 'package:json_buddy/helper/short_cut_provider.dart';
 import 'package:json_buddy/controller/json_controller.dart';
@@ -142,7 +143,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    'Drop your file to parse it',
+                    Translation.getText('drop_file_message'),
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
@@ -150,7 +151,7 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          tooltip: 'Parse JSON',
+          tooltip: Translation.getText('parse_JSON'),
           child: Pulse(
             shouldShowPulse: showPulse,
             child: const Icon(Icons.code),
@@ -167,8 +168,10 @@ class _MainScreenState extends State<MainScreen> {
           } catch (ex) {
             jsonController.text = "";
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Unable to read the file'),
+              SnackBar(
+                content: Text(
+                  Translation.getText('read_file_error'),
+                ),
               ),
             );
           }
@@ -203,7 +206,7 @@ class _MainScreenState extends State<MainScreen> {
             focusNode: searchFocusNode,
             controller: searchController,
             decoration: InputDecoration(
-              hintText: 'Search for something using JsonPath',
+              hintText: Translation.getText('search_hint_text'),
               prefixIcon: const Icon(Icons.search),
               filled: filterSyntaxError,
               fillColor: filterSyntaxError ? errorColor : null,
@@ -212,7 +215,7 @@ class _MainScreenState extends State<MainScreen> {
                 onPressed: () {
                   _setSearchMode(false);
                 },
-                tooltip: 'Close search',
+                tooltip: Translation.getText('close_search_tooltip'),
               ),
             ),
           ),
@@ -229,8 +232,9 @@ class _MainScreenState extends State<MainScreen> {
                   _setSearchMode(true);
                 },
           icon: const Icon(Icons.search),
-          tooltip:
-              currentParsedModel == null ? 'Validate JSON first' : 'Search',
+          tooltip: currentParsedModel == null
+              ? Translation.getText('search_tooltip_model_missing')
+              : Translation.getText('search_tooltip'),
         ),
       );
       actions.add(
@@ -243,7 +247,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: const Icon(
               Icons.settings,
             ),
-            tooltip: 'Settings',
+            tooltip: Translation.getText('setting_tooltip'),
           ),
         ),
       );
@@ -311,7 +315,9 @@ class _MainScreenState extends State<MainScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Settings'),
+          title: Text(
+            Translation.getText('setting_title'),
+          ),
           content: SizedBox(
             height: 250,
             width: 325,

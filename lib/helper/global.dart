@@ -8,4 +8,5 @@ const String settingIndent = "settingIndent";
 
 class GlobalConfig {
   static final shortCutProvider = ShortCutProvirer();
+  static String currentLanguage = "en";
 }

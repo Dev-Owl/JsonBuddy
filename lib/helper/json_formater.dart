@@ -1,4 +1,4 @@
-import 'package:json_buddy/global.dart';
+import 'package:json_buddy/helper/global.dart';
 
 class JsonFormater {
   String formatText(String input) {

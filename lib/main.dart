@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:json_buddy/global.dart';
+import 'package:intl/intl_standalone.dart';
+import 'package:json_buddy/helper/global.dart';
+import 'package:json_buddy/helper/globalization.dart';
 import 'package:json_buddy/helper/short_cut_provider.dart';
 import 'package:json_buddy/main_screen.dart';
-import 'package:json_buddy/theme.dart';
+import 'package:json_buddy/helper/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /*
@@ -18,6 +20,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();
+  var sysLocal = await findSystemLocale();
+  sysLocal = sysLocal.split("_").first.toLowerCase();
+  if (valuesByLanguage.containsKey(sysLocal)) {
+    GlobalConfig.currentLanguage = sysLocal;
+  }
   runApp(const MyApp());
 }
 
