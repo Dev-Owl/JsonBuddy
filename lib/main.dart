@@ -6,6 +6,15 @@ import 'package:json_buddy/main_screen.dart';
 import 'package:json_buddy/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/*
+    TODO: 
+          - First start tutorial
+          - Help screen, button to restart tutorial, explain shortcuts
+          - Multiple languages
+          - Code clean up
+          - Create test cases
+*/
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();

@@ -33,6 +33,7 @@ dependencies:
   highlight: ^0.7.0
   json_path: ^0.4.0
   linked_scroll_controller: ^0.2.0
+  pulse_widget: ^0.0.2
   shared_preferences: ^2.0.13
 
 dev_dependencies:

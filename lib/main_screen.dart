@@ -10,6 +10,7 @@ import 'package:json_buddy/line_number_text_field.dart';
 import 'package:json_buddy/settings_dialog.dart';
 import 'package:json_buddy/theme.dart';
 import 'package:json_path/json_path.dart';
+import 'package:pulse_widget/pulse_widget.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -47,7 +48,11 @@ class _MainScreenState extends State<MainScreen> {
   /// Focus node for the search input
   final searchFocusNode = FocusNode();
 
+  /// Callback that is tirggered by the search
   late final VoidCallback searchHotkeyCallback;
+
+  /// Indicate if we should show a pulse to inform the user to parse the text
+  bool showPulse = true;
 
   @override
   void initState() {
@@ -72,6 +77,12 @@ class _MainScreenState extends State<MainScreen> {
       JsonBuddyShortcut.validateCode,
       _tryparse,
     );
+  }
+
+  void _userChangedText() {
+    debouncer(() => setState(() {
+          showPulse = true;
+        }));
   }
 
   @override
@@ -105,12 +116,17 @@ class _MainScreenState extends State<MainScreen> {
         child: LineNumberTextField(
           filteredTextEditingController: filteredTextController,
           textEditingController: jsonController,
+          userTextChangeCallback: _userChangedText,
           currentError: lastError,
           displayFilterView: searchModeActive,
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.code),
+        tooltip: 'Parse JSON',
+        child: Pulse(
+          shouldShowPulse: showPulse,
+          child: const Icon(Icons.code),
+        ),
         onPressed: _tryparse,
       ),
     );
@@ -208,6 +224,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void _tryparse() {
     const decoder = JsonDecoder();
+    showPulse = false;
     try {
       final indent = prefs.getInt(settingIndent) ?? 2;
       jsonController.text = anyWayFormat.formatText(jsonController.text);

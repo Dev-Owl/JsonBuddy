@@ -12,13 +12,15 @@ class LineNumberTextField extends StatefulWidget {
   final FormatException? currentError;
   final bool displayFilterView;
   final TextEditingController filteredTextEditingController;
-  const LineNumberTextField(
-      {required this.textEditingController,
-      required this.filteredTextEditingController,
-      this.currentError,
-      this.displayFilterView = false,
-      Key? key})
-      : super(key: key);
+  final VoidCallback userTextChangeCallback;
+  const LineNumberTextField({
+    required this.textEditingController,
+    required this.filteredTextEditingController,
+    required this.userTextChangeCallback,
+    this.currentError,
+    this.displayFilterView = false,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<LineNumberTextField> createState() => _LineNumberTextFieldState();
@@ -122,6 +124,7 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
             scrollController: _scrollControllerJson,
             maxLines: null,
             style: textStyle,
+            onChanged: (_) => widget.userTextChangeCallback(),
             decoration: const InputDecoration(
               border: InputBorder.none,
             ),
