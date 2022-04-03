@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_highlight/theme_map.dart';
 import 'package:highlight/highlight.dart';
 import 'package:highlight/languages/json.dart';
-import 'package:json_buddy/global.dart';
+import 'package:json_buddy/helper/global.dart';
 
 class JsonController extends TextEditingController {
   FormatException? _errorPresent;

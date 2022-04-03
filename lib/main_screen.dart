@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
-import 'package:json_buddy/global.dart';
+import 'package:json_buddy/helper/global.dart';
 import 'package:json_buddy/helper/debouncer.dart';
 import 'package:json_buddy/helper/json_formater.dart';
 import 'package:json_buddy/helper/short_cut_provider.dart';
-import 'package:json_buddy/json_controller.dart';
-import 'package:json_buddy/line_number_text_field.dart';
-import 'package:json_buddy/settings_dialog.dart';
-import 'package:json_buddy/theme.dart';
+import 'package:json_buddy/controller/json_controller.dart';
+import 'package:json_buddy/widgets/line_number_text_field.dart';
+import 'package:json_buddy/widgets/settings_dialog.dart';
+import 'package:json_buddy/helper/theme.dart';
 import 'package:json_path/json_path.dart';
 import 'package:pulse_widget/pulse_widget.dart';
 
@@ -161,8 +161,17 @@ class _MainScreenState extends State<MainScreen> {
       onDragDone: (eventDetails) {
         final file = eventDetails.files.first;
         file.readAsString().then((value) {
-          jsonController.text = value;
-          _tryparse();
+          try {
+            jsonController.text = value;
+            _tryparse();
+          } catch (ex) {
+            jsonController.text = "";
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Unable to read the file'),
+              ),
+            );
+          }
         });
         setState(() {
           draggingActive = false;

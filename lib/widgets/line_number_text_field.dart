@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/theme_map.dart';
-import 'package:json_buddy/global.dart';
-import 'package:json_buddy/line_number_controller.dart';
-import 'package:json_buddy/syntax_error.dart';
+import 'package:json_buddy/helper/global.dart';
+import 'package:json_buddy/controller/line_number_controller.dart';
+import 'package:json_buddy/widgets/syntax_error.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 class LineNumberTextField extends StatefulWidget {

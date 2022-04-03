@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/theme_map.dart';
-import 'package:json_buddy/global.dart';
+import 'package:json_buddy/helper/global.dart';
 import 'package:json_buddy/main.dart';
 
 class SettingsDialog extends StatefulWidget {

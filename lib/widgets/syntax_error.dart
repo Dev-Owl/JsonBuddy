@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:json_buddy/theme.dart';
+import 'package:json_buddy/helper/theme.dart';
 
 class SyntaxError extends StatelessWidget {
   final FormatException lastError;
