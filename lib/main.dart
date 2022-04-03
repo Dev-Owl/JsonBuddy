@@ -10,9 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /*
     TODO: 
+          - Multiple languages
           - First start tutorial
           - Help screen, button to restart tutorial, explain shortcuts
-          - Multiple languages
           - Code clean up
           - Create test cases
 */
