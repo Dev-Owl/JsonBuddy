@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:json_buddy/global.dart';
 import 'package:json_buddy/helper/debouncer.dart';
@@ -53,6 +54,9 @@ class _MainScreenState extends State<MainScreen> {
 
   /// Indicate if we should show a pulse to inform the user to parse the text
   bool showPulse = true;
+
+  /// Indeicate if an user drags a file into the app
+  bool draggingActive = false;
 
   @override
   void initState() {
@@ -109,26 +113,71 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _createAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(5),
-        child: LineNumberTextField(
-          filteredTextEditingController: filteredTextController,
-          textEditingController: jsonController,
-          userTextChangeCallback: _userChangedText,
-          currentError: lastError,
-          displayFilterView: searchModeActive,
+    return DropTarget(
+      child: Scaffold(
+        appBar: _createAppBar(),
+        body: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(5),
+              child: LineNumberTextField(
+                filteredTextEditingController: filteredTextController,
+                textEditingController: jsonController,
+                userTextChangeCallback: _userChangedText,
+                currentError: lastError,
+                displayFilterView: searchModeActive,
+              ),
+            ),
+            if (draggingActive)
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 350,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).dialogBackgroundColor,
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Drop your file to parse it',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ),
+              )
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          tooltip: 'Parse JSON',
+          child: Pulse(
+            shouldShowPulse: showPulse,
+            child: const Icon(Icons.code),
+          ),
+          onPressed: _tryparse,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Parse JSON',
-        child: Pulse(
-          shouldShowPulse: showPulse,
-          child: const Icon(Icons.code),
-        ),
-        onPressed: _tryparse,
-      ),
+      onDragDone: (eventDetails) {
+        final file = eventDetails.files.first;
+        file.readAsString().then((value) {
+          jsonController.text = value;
+          _tryparse();
+        });
+        setState(() {
+          draggingActive = false;
+        });
+      },
+      onDragEntered: (eventDetails) {
+        setState(() {
+          draggingActive = true;
+        });
+      },
+      onDragExited: (eventDetails) {
+        setState(() {
+          draggingActive = false;
+        });
+      },
     );
   }
 
