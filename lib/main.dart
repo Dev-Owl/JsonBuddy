@@ -10,9 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /*
     TODO: 
-          - Multiple languages
+          - Multiple languages for tool
           - When editing in valid JSON keep indent for next line
           - Ensure that font color for all is readable on enditor backend
+          - Show cursor position bottom right L1 C3 
           - Ensure error is displayed for all styles 
           - Testing
           - First start tutorial
