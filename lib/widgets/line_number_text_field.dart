@@ -42,6 +42,9 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
 
   LinkedScrollControllerGroup? _controllers;
 
+  int? carretPositionInLine;
+  int? carretLine;
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +52,40 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
 
     widget.textEditingController.addListener(() {
       _lineNumberController!.text = widget.textEditingController.text;
+      final currentOffset = widget.textEditingController.selection.start;
+      if (currentOffset < 0) {
+        setState(() {
+          carretLine = null;
+          carretPositionInLine = null;
+        });
+      } else {
+        final source = widget.textEditingController.text;
+        int lineNum = 1;
+        int lineStart = 0;
+        bool previousCharWasCR = false;
+        for (int i = 0; i < currentOffset; i++) {
+          int char = source.codeUnitAt(i);
+          if (char == 0x0a) {
+            if (lineStart != i || !previousCharWasCR) {
+              lineNum++;
+            }
+            lineStart = i + 1;
+            previousCharWasCR = false;
+          } else if (char == 0x0d) {
+            lineNum++;
+            lineStart = i + 1;
+            previousCharWasCR = true;
+          }
+        }
+        carretLine = lineNum;
+        setState(() {
+          if (lineNum > 1) {
+            carretPositionInLine = currentOffset - lineStart + 1;
+          } else {
+            carretPositionInLine = currentOffset + 1;
+          }
+        });
+      }
     });
 
     _controllers = LinkedScrollControllerGroup();
@@ -119,15 +156,29 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
       builder: (BuildContext context, BoxConstraints constraints) {
         // Control horizontal scrolling
         return _wrapInScrollView(
-          TextField(
-            controller: widget.textEditingController,
-            scrollController: _scrollControllerJson,
-            maxLines: null,
-            style: textStyle,
-            onChanged: (_) => widget.userTextChangeCallback(),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-            ),
+          Stack(
+            children: [
+              TextField(
+                controller: widget.textEditingController,
+                scrollController: _scrollControllerJson,
+                maxLines: null,
+                style: textStyle,
+                onChanged: (_) => widget.userTextChangeCallback(),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                ),
+              ),
+              if (carretLine != null && carretPositionInLine != null)
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    'L $carretLine C $carretPositionInLine',
+                    style: themeMap[themeToUse]![_rootKey]!.copyWith(
+                      fontSize: 10,
+                    ),
+                  ),
+                )
+            ],
           ),
           constraints.maxWidth,
           themeToUse,

@@ -41,7 +41,6 @@ class JsonController extends TextEditingController {
       }
       errorLine = lineNum;
     }
-
     notifyListeners();
   }
 
