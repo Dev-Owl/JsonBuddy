@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
+            VALUE "CompanyName", "devowl.de" "\0"
             VALUE "FileDescription", "json_buddy" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "json_buddy" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022 devowl.de. All rights reserved." "\0"
             VALUE "OriginalFilename", "json_buddy.exe" "\0"
-            VALUE "ProductName", "json_buddy" "\0"
+            VALUE "ProductName", "JSON Buddy" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
