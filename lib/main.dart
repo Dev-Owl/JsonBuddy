@@ -9,16 +9,21 @@ import 'package:json_buddy/helper/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /*
-    TODO: 
-          - Multiple languages for tool
+    Roadmap: 
           - When editing in valid JSON keep indent for next line
-          - Ensure that font color for all is readable on enditor backend          
-          - Ensure error is displayed for all styles 
-          - Testing
+          - Ensure that font color for all is readable on editor (themes)
+          - Ensure error is displayed for all styles proper in json
+          - MVP milestone -
+          - Code clean up
+          - add menu left
+            -> Minify option
+            -> Export to JSON, CSV, XML?
           - First start tutorial
           - Help screen, button to restart tutorial, explain shortcuts
-          - Code clean up
+          - Multiple languages for tool
+          - Manual Testing
           - Create test cases
+          - To the store
 */
 
 void main() async {
