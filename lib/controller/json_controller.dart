@@ -121,10 +121,3 @@ class JsonController extends TextEditingController {
     return spans;
   }
 }
-
-
-/*
-
-  If text between ""
-
-*/

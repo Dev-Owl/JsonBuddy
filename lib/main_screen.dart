@@ -117,6 +117,60 @@ class _MainScreenState extends State<MainScreen> {
     return DropTarget(
       child: Scaffold(
         appBar: _createAppBar(),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.orange[300]!,
+                ),
+                child: Stack(
+                  children: [
+                    const Align(
+                      alignment: Alignment.topLeft,
+                      child: Image(
+                        fit: BoxFit.scaleDown,
+                        image: AssetImage('assets/images/logo_128.png'),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'JSON Buddy',
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                              color: Colors.black,
+                            ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.save_as),
+                title: const Text('Export'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.compress),
+                title: const Text('Minify'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings),
+                title: const Text('Setting'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showMyDialog();
+                },
+              ),
+            ],
+          ),
+        ),
         body: Stack(
           children: [
             Padding(
@@ -194,9 +248,8 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   AppBar _createAppBar() {
-    late Widget child;
+    Widget? child;
     List<Widget> actions = [];
-    Widget? leading;
     if (searchModeActive) {
       child = SizedBox(
         width: double.infinity,
@@ -222,38 +275,25 @@ class _MainScreenState extends State<MainScreen> {
         ),
       );
     } else {
-      child = const Text('JSON Buddy');
-      leading = Padding(
-        padding: const EdgeInsets.only(left: 15),
-        child: IconButton(
-          onPressed: currentParsedModel == null
-              ? null
-              : () {
-                  _setSearchMode(true);
-                },
-          icon: const Icon(Icons.search),
-          tooltip: currentParsedModel == null
-              ? Translation.getText('search_tooltip_model_missing')
-              : Translation.getText('search_tooltip'),
-        ),
-      );
+      //child = const Text('JSON Buddy');
       actions.add(
         Padding(
           padding: const EdgeInsets.only(right: 15),
           child: IconButton(
-            onPressed: () async {
-              _showMyDialog();
-            },
-            icon: const Icon(
-              Icons.settings,
-            ),
-            tooltip: Translation.getText('setting_tooltip'),
+            onPressed: currentParsedModel == null
+                ? null
+                : () {
+                    _setSearchMode(true);
+                  },
+            icon: const Icon(Icons.search),
+            tooltip: currentParsedModel == null
+                ? Translation.getText('search_tooltip_model_missing')
+                : Translation.getText('search_tooltip'),
           ),
         ),
       );
     }
     return AppBar(
-      leading: leading,
       title: child,
       actions: actions,
     );
