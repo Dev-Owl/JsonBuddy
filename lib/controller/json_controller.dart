@@ -50,33 +50,44 @@ class JsonController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
-    final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
-    final syntaxNodes = highlight.parse(
-      text,
-      language: 'json',
-    );
     List<TextSpan> children = [];
-    if ((syntaxNodes.relevance ?? 0) > 0) {
-      children = _convert(syntaxNodes.nodes!);
+    if (errorPresent) {
+      children.addAll(_tryFormatWithError());
     } else {
-      final list = text.split('\n');
-      for (var i = 0; i < list.length; ++i) {
-        final childStyle = errorPresent && i == errorLine
-            ? themeMap[themeToUse]!['root']!.copyWith(
-                color: Colors.red,
-                backgroundColor: const Color(0xFFfbe3e4),
-              )
-            : themeMap[themeToUse]!['root'];
-
-        children.add(TextSpan(
-          text: "${list[i]}\n",
-          style: childStyle,
-        ));
+      final syntaxNodes = highlight.parse(
+        text,
+        language: 'json',
+      );
+      if ((syntaxNodes.relevance ?? 0) > 0) {
+        children = _convert(syntaxNodes.nodes!);
+      } else {
+        children.addAll(_tryFormatWithError());
       }
     }
     return TextSpan(
       children: children,
     );
+  }
+
+  //TODO Try to add basic formating rules to the text
+  List<TextSpan> _tryFormatWithError() {
+    List<TextSpan> children = [];
+    final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
+    final list = text.split('\n');
+    for (var i = 0; i < list.length; ++i) {
+      final childStyle = errorPresent && i == errorLine
+          ? themeMap[themeToUse]!['root']!.copyWith(
+              color: Colors.red,
+              backgroundColor: const Color(0xFFfbe3e4),
+            )
+          : themeMap[themeToUse]!['root'];
+
+      children.add(TextSpan(
+        text: "${list[i]}\n",
+        style: childStyle,
+      ));
+    }
+    return children;
   }
 
   List<TextSpan> _convert(List<Node> nodes) {
