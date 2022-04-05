@@ -64,7 +64,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     jsonController = JsonController();
     jsonController.text =
-        '{"name":"John", "age": 30, "car":null, "happy":true}';
+        '{"name":"John", "age": 30, "car":[123.5,"fast"], "happy":true, "hobby":{"development":true}}';
     filteredTextController = JsonController();
 
     searchController = TextEditingController(text: "\$.*");
