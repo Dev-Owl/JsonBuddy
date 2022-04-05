@@ -3,7 +3,7 @@ import 'package:json_buddy/helper/global.dart';
 class JsonFormater {
   String formatText(String input) {
     final indent = (prefs.getInt(settingIndent) ?? 2);
-    final indentToUse = '' * indent;
+    final indentToUse = ' ' * indent;
     var formatedResult = '';
     var currentLevel = 0;
     var inQuotes = false;
@@ -40,7 +40,7 @@ class JsonFormater {
             break;
 
           case ':':
-            post = indentToUse;
+            post = ' ';
             break;
 
           case " ":
