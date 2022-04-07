@@ -8,24 +8,6 @@ import 'package:json_buddy/main_screen.dart';
 import 'package:json_buddy/helper/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/*
-    Roadmap: 
-          - When editing in valid JSON keep indent for next line
-          - Ensure that font color for all is readable on editor (themes)
-          - Ensure error is displayed for all styles proper in json
-          - MVP milestone -
-          - Code clean up
-          - add menu left
-            -> Minify option
-            -> Export to JSON, CSV, XML?
-          - First start tutorial
-          - Help screen, button to restart tutorial, explain shortcuts
-          - Multiple languages for tool
-          - Manual Testing
-          - Create test cases
-          - To the store
-*/
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();
