@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:json_buddy/helper/global.dart';
 import 'package:json_buddy/helper/debouncer.dart';
@@ -149,8 +151,21 @@ class _MainScreenState extends State<MainScreen> {
               ListTile(
                 leading: const Icon(Icons.save_as),
                 title: const Text('Export'),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
+                  String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle: 'Please select an output file:',
+                    fileName: 'my_json.json',
+                    lockParentWindow: true,
+                  );
+                  if (outputFile != null) {
+                    try {
+                      final fileOnDisk = File(outputFile);
+                      fileOnDisk.writeAsString(jsonController.text);
+                    } catch (ex) {
+                      print(ex.toString());
+                    }
+                  }
                 },
               ),
               ListTile(
