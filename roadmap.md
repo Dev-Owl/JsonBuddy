@@ -1,12 +1,12 @@
 
 # Roadmap /  Todo 
-          - Syntax highlighting by line, support broken json
           - When editing in valid JSON keep indent for next line
           - Ensure that font color for all is readable on editor (themes)
           - Ensure error is displayed for all styles proper in json
           - add menu left
             -> Minify option
             -> Export to JSON, CSV, XML?
+          - Syntax highlighting by line, support broken json 
           - Clean settings dialog (UI/colors)
           - Code clean up          
           - First start tutorial
