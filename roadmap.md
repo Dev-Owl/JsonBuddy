@@ -2,7 +2,6 @@
 # Roadmap /  Todo 
 
           - add menu left
-            -> Open file from disk
             -> Minify option
             -> Export to JSON, CSV, XML?
           - Ensure that font color for all is readable on editor (themes)
