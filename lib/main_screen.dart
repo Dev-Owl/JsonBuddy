@@ -149,6 +149,22 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
               ListTile(
+                leading: const Icon(Icons.file_open),
+                title: const Text('Open file'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final result = await FilePicker.platform.pickFiles(
+                    dialogTitle: 'Open a JSON file',
+                    allowMultiple: false,
+                  );
+                  if (result != null) {
+                    final selectedFile = result.files.first;
+                    jsonController.text =
+                        await File(selectedFile.path!).readAsString();
+                  }
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.save_as),
                 title: const Text('Export'),
                 onTap: () async {

@@ -1,11 +1,12 @@
 
 # Roadmap /  Todo 
-          - Ensure that font color for all is readable on editor (themes)
-          - Ensure error is displayed for all styles proper in json
+
           - add menu left
             -> Open file from disk
             -> Minify option
             -> Export to JSON, CSV, XML?
+          - Ensure that font color for all is readable on editor (themes)
+          - Ensure error is displayed for all styles proper in json
           - Syntax highlighting by line, support broken json 
           - Clean settings dialog (UI/colors)
           - Code clean up          
