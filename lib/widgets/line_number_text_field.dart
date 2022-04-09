@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_highlight/theme_map.dart';
 import 'package:json_buddy/helper/global.dart';
 import 'package:json_buddy/controller/line_number_controller.dart';
+import 'package:json_buddy/helper/string_helper.dart';
 import 'package:json_buddy/widgets/syntax_error.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
@@ -45,11 +47,20 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
   int? carretPositionInLine;
   int? carretLine;
 
+  int countIndentAmount(String text) {
+    var i = 0;
+    for (i = 0; i < text.length; ++i) {
+      if (text[i] != indentChar) {
+        break;
+      }
+    }
+    return i;
+  }
+
   @override
   void initState() {
     super.initState();
     _lineNumberController = LineNumberController()..text = "";
-
     widget.textEditingController.addListener(() {
       _lineNumberController!.text = widget.textEditingController.text;
       final currentOffset = widget.textEditingController.selection.start;
@@ -151,21 +162,86 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
         disabledBorder: InputBorder.none,
       ),
     );
+    final focusNode = FocusNode(
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.enter ||
+              event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+            debugPrint('enter');
+            //Only if we have line breaks
+            if (widget.textEditingController.text.contains("\n")) {
+              var newText = widget.textEditingController.text;
+              final currentCarretPosition =
+                  widget.textEditingController.selection.start;
+              var nextCarretPosition = currentCarretPosition + 1;
+              if (newText.length == currentCarretPosition) {
+                newText += "\n";
+              } else {
+                //if enter end the end of a line take indet from the next
+                //if enter in a line take indet of current
+                final endOfLine =
+                    newText.codeUnitAt(currentCarretPosition) == 0x0a;
 
+                if (endOfLine) {
+                  final tmpText = newText.splitAt(currentCarretPosition + 1);
+                  final lines = tmpText.first.split("\n");
+                  lines.removeWhere((element) => element.isEmpty);
+                  final currentLine = lines.last;
+                  final indents = countIndentAmount(currentLine);
+                  newText = [
+                    tmpText.first,
+                    indentChar * indents,
+                    '\n',
+                    tmpText.last
+                  ].join();
+                  nextCarretPosition += indents;
+                } else {
+                  final tmpText = newText.splitAt(currentCarretPosition);
+                  final lines = tmpText.first.split("\n");
+                  final indents = countIndentAmount(lines.last);
+                  newText = [
+                    tmpText.first,
+                    "\n",
+                    indentChar * indents,
+                    tmpText.last,
+                  ].join();
+                  nextCarretPosition += indents;
+                }
+              }
+
+              widget.textEditingController.value = TextEditingValue(
+                text: newText,
+                selection: TextSelection.fromPosition(
+                  TextPosition(
+                    offset: nextCarretPosition,
+                  ),
+                ),
+              );
+              return KeyEventResult.handled;
+            }
+          }
+          return KeyEventResult.ignored;
+        }
+        return KeyEventResult.ignored;
+      },
+    );
     final jsonField = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         // Control horizontal scrolling
         return _wrapInScrollView(
           Stack(
             children: [
-              TextField(
-                controller: widget.textEditingController,
-                scrollController: _scrollControllerJson,
-                maxLines: null,
-                style: textStyle,
-                onChanged: (_) => widget.userTextChangeCallback(),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
+              RawKeyboardListener(
+                focusNode: focusNode,
+                child: TextField(
+                  controller: widget.textEditingController,
+                  scrollController: _scrollControllerJson,
+                  maxLines: null,
+                  style: textStyle,
+                  onChanged: (_) => widget.userTextChangeCallback(),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
               if (carretLine != null && carretPositionInLine != null)

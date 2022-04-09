@@ -290,7 +290,6 @@ class _MainScreenState extends State<MainScreen> {
         ),
       );
     } else {
-      //child = const Text('JSON Buddy');
       actions.add(
         Padding(
           padding: const EdgeInsets.only(right: 15),

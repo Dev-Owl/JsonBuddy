@@ -5,6 +5,7 @@ late final SharedPreferences prefs;
 const String settingUseDarkTheme = "settingUseDarkTheme";
 const String settingCodeTheme = "settingCodeTheme";
 const String settingIndent = "settingIndent";
+const String indentChar = " ";
 
 class GlobalConfig {
   static final shortCutProvider = ShortCutProvirer();
