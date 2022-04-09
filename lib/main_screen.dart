@@ -163,7 +163,12 @@ class _MainScreenState extends State<MainScreen> {
                       final fileOnDisk = File(outputFile);
                       fileOnDisk.writeAsString(jsonController.text);
                     } catch (ex) {
-                      print(ex.toString());
+                      const snackBar = SnackBar(
+                        content: Text(
+                          'Error saving your file',
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
                   }
                 },

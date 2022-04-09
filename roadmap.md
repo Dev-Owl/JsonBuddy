@@ -1,6 +1,5 @@
 
 # Roadmap /  Todo 
-          - When editing in valid JSON keep indent for next line
           - Ensure that font color for all is readable on editor (themes)
           - Ensure error is displayed for all styles proper in json
           - add menu left
