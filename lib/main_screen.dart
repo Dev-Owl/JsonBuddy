@@ -152,15 +152,25 @@ class _MainScreenState extends State<MainScreen> {
                 leading: const Icon(Icons.file_open),
                 title: const Text('Open file'),
                 onTap: () async {
-                  Navigator.pop(context);
-                  final result = await FilePicker.platform.pickFiles(
-                    dialogTitle: 'Open a JSON file',
-                    allowMultiple: false,
-                  );
-                  if (result != null) {
-                    final selectedFile = result.files.first;
-                    jsonController.text =
-                        await File(selectedFile.path!).readAsString();
+                  try {
+                    Navigator.pop(context);
+                    final result = await FilePicker.platform.pickFiles(
+                      dialogTitle: 'Open a JSON file',
+                      allowMultiple: false,
+                    );
+                    if (result != null) {
+                      final selectedFile = result.files.first;
+                      jsonController.text =
+                          await File(selectedFile.path!).readAsString();
+                    }
+                  } catch (ex) {
+                    const snackBar = SnackBar(
+                      content: Text(
+                        'Error opening your file',
+                      ),
+                      backgroundColor: errorColor,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                 },
               ),
@@ -179,10 +189,12 @@ class _MainScreenState extends State<MainScreen> {
                       final fileOnDisk = File(outputFile);
                       fileOnDisk.writeAsString(jsonController.text);
                     } catch (ex) {
+                      //TODO refactor, duplicate add generic error snackbar
                       const snackBar = SnackBar(
                         content: Text(
                           'Error saving your file',
                         ),
+                        backgroundColor: errorColor,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
