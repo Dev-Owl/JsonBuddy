@@ -10,6 +10,7 @@
           - Clean settings dialog (UI/colors)
           - Search result should not scroll with the rest
           - Re-run search on parse
+          - On parse error scroll to text pos
           - Code clean up          
           - First start tutorial
           - Help screen, button to restart tutorial, explain shortcuts
