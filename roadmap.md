@@ -2,7 +2,6 @@
 # Roadmap /  Todo 
 
           - add menu left
-            -> Minify option
             -> Export to JSON, CSV, XML?
           - Ensure that font color for all is readable on editor (themes)
           - Ensure error is displayed for all styles proper in json
