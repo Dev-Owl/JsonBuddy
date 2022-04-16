@@ -4,6 +4,8 @@ enum JsonBuddyShortcut {
   search,
   validateCode,
   minify,
+  saveFile,
+  openFile,
 }
 
 class ShortCutProvirer {

@@ -11,6 +11,8 @@ import 'package:json_buddy/helper/json_formater.dart';
 import 'package:json_buddy/helper/short_cut_provider.dart';
 import 'package:json_buddy/controller/json_controller.dart';
 import 'package:json_buddy/widgets/line_number_text_field.dart';
+import 'package:json_buddy/widgets/main_menu.dart';
+import 'package:json_buddy/widgets/main_menu_item.dart';
 import 'package:json_buddy/widgets/settings_dialog.dart';
 import 'package:json_buddy/helper/theme.dart';
 import 'package:json_path/json_path.dart';
@@ -88,6 +90,14 @@ class _MainScreenState extends State<MainScreen> {
       JsonBuddyShortcut.minify,
       _tryMinify,
     );
+    GlobalConfig.shortCutProvider.addShortCutListner(
+      JsonBuddyShortcut.saveFile,
+      _saveToFile,
+    );
+    GlobalConfig.shortCutProvider.addShortCutListner(
+      JsonBuddyShortcut.openFile,
+      _openFile,
+    );
   }
 
   void _tryMinify() {
@@ -116,6 +126,15 @@ class _MainScreenState extends State<MainScreen> {
       JsonBuddyShortcut.minify,
       _tryMinify,
     );
+    GlobalConfig.shortCutProvider.removeShortCutListner(
+      JsonBuddyShortcut.saveFile,
+      _saveToFile,
+    );
+    GlobalConfig.shortCutProvider.removeShortCutListner(
+      JsonBuddyShortcut.saveFile,
+      _openFile,
+    );
+
     super.dispose();
   }
 
@@ -134,114 +153,54 @@ class _MainScreenState extends State<MainScreen> {
       child: Scaffold(
         appBar: _createAppBar(),
         drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.orange[300]!,
-                ),
-                child: Stack(
-                  children: [
-                    const Align(
-                      alignment: Alignment.topLeft,
-                      child: Image(
-                        fit: BoxFit.scaleDown,
-                        image: AssetImage('assets/images/logo_128.png'),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'JSON Buddy',
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                              color: Colors.black,
-                            ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.file_open),
-                title: const Text('Open file'),
-                onTap: () async {
-                  try {
-                    Navigator.pop(context);
-                    final result = await FilePicker.platform.pickFiles(
-                      dialogTitle: 'Open a JSON file',
-                      allowMultiple: false,
-                    );
-                    if (result != null) {
-                      final selectedFile = result.files.first;
-                      jsonController.text =
-                          await File(selectedFile.path!).readAsString();
-                    }
-                  } catch (ex) {
-                    const snackBar = SnackBar(
-                      content: Text(
-                        'Error opening your file',
-                      ),
-                      backgroundColor: errorColor,
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.save_as),
-                title: const Text('Export'),
-                onTap: () async {
+          child: MainMenu(
+            menuItems: [
+              MainMenuItem(
+                title: 'Open file',
+                icon: Icons.file_open,
+                toolTipText: 'CTRL + O',
+                onTap: () {
                   Navigator.pop(context);
-                  String? outputFile = await FilePicker.platform.saveFile(
-                    dialogTitle: 'Please select an output file:',
-                    fileName: 'my_json.json',
-                    lockParentWindow: true,
-                  );
-                  if (outputFile != null) {
-                    try {
-                      final fileOnDisk = File(outputFile);
-                      fileOnDisk.writeAsString(jsonController.text);
-                    } catch (ex) {
-                      //TODO refactor, duplicate add generic error snackbar
-                      const snackBar = SnackBar(
-                        content: Text(
-                          'Error saving your file',
-                        ),
-                        backgroundColor: errorColor,
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
-                  }
+                  _openFile();
                 },
               ),
-              Tooltip(
-                message: 'CTRL + i',
-                waitDuration: const Duration(
-                  seconds: 1,
-                ),
-                child: ListTile(
-                  leading: const Icon(Icons.compress),
-                  title: const Text('Minify'),
-                  subtitle: currentParsedModel == null
-                      ? const Text('Parse JSON first')
-                      : null,
-                  onTap: currentParsedModel != null
-                      ? () {
-                          Navigator.pop(context);
-                          _tryMinify();
-                        }
-                      : null,
-                ),
+              MainMenuItem(
+                title: 'Save',
+                icon: Icons.save_as,
+                toolTipText: 'CTRL + S',
+                onTap: () {
+                  Navigator.pop(context);
+                  _saveToFile();
+                },
               ),
-              ListTile(
-                leading: const Icon(Icons.settings),
-                title: const Text('Setting'),
+              MainMenuItem(
+                title: 'Export',
+                icon: Icons.import_export,
+                onTap: currentParsedModel != null
+                    ? () {
+                        Navigator.pop(context);
+                      }
+                    : null,
+              ),
+              MainMenuItem(
+                title: 'Minify',
+                icon: Icons.compress,
+                toolTipText: 'CTRL + i',
+                onTap: currentParsedModel != null
+                    ? () {
+                        Navigator.pop(context);
+                        _tryMinify();
+                      }
+                    : null,
+              ),
+              MainMenuItem(
+                title: 'Setting',
+                icon: Icons.settings,
                 onTap: () {
                   Navigator.pop(context);
                   _showMyDialog();
                 },
-              ),
+              )
             ],
           ),
         ),
@@ -319,6 +278,50 @@ class _MainScreenState extends State<MainScreen> {
         });
       },
     );
+  }
+
+  Future _openFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        dialogTitle: 'Open a JSON file',
+        allowMultiple: false,
+      );
+      if (result != null) {
+        final selectedFile = result.files.first;
+        jsonController.text = await File(selectedFile.path!).readAsString();
+      }
+    } catch (ex) {
+      const snackBar = SnackBar(
+        content: Text(
+          'Error opening your file',
+        ),
+        backgroundColor: errorColor,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  Future _saveToFile() async {
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Please select an output file:',
+      fileName: 'my_json.json',
+      lockParentWindow: true,
+    );
+    if (outputFile != null) {
+      try {
+        final fileOnDisk = File(outputFile);
+        fileOnDisk.writeAsString(jsonController.text);
+      } catch (ex) {
+        //TODO refactor, duplicate add generic error snackbar
+        const snackBar = SnackBar(
+          content: Text(
+            'Error saving your file',
+          ),
+          backgroundColor: errorColor,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    }
   }
 
   AppBar _createAppBar() {
