@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:json_buddy/helper/global.dart';
 
 class JsonFormater {
@@ -62,5 +64,10 @@ class JsonFormater {
     }
 
     return formatedResult.trim();
+  }
+
+  String minify(dynamic parsedModel) {
+    const encoder = JsonEncoder.withIndent(null);
+    return encoder.convert(parsedModel);
   }
 }

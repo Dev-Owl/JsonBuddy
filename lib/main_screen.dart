@@ -76,14 +76,24 @@ class _MainScreenState extends State<MainScreen> {
       });
     });
     searchHotkeyCallback = () => _setSearchMode(!searchModeActive);
-    GlobalConfig.shortCutProvider.addSearchListner(
+    GlobalConfig.shortCutProvider.addShortCutListner(
       JsonBuddyShortcut.search,
       searchHotkeyCallback,
     );
-    GlobalConfig.shortCutProvider.addSearchListner(
+    GlobalConfig.shortCutProvider.addShortCutListner(
       JsonBuddyShortcut.validateCode,
       _tryparse,
     );
+    GlobalConfig.shortCutProvider.addShortCutListner(
+      JsonBuddyShortcut.minify,
+      _tryMinify,
+    );
+  }
+
+  void _tryMinify() {
+    if (currentParsedModel != null) {
+      jsonController.text = customJsonFormater.minify(currentParsedModel);
+    }
   }
 
   void _userChangedText() {
@@ -94,13 +104,17 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void dispose() {
-    GlobalConfig.shortCutProvider.removeSearchListner(
+    GlobalConfig.shortCutProvider.removeShortCutListner(
       JsonBuddyShortcut.search,
       searchHotkeyCallback,
     );
-    GlobalConfig.shortCutProvider.removeSearchListner(
+    GlobalConfig.shortCutProvider.removeShortCutListner(
       JsonBuddyShortcut.validateCode,
       _tryparse,
+    );
+    GlobalConfig.shortCutProvider.removeShortCutListner(
+      JsonBuddyShortcut.minify,
+      _tryMinify,
     );
     super.dispose();
   }
@@ -201,12 +215,24 @@ class _MainScreenState extends State<MainScreen> {
                   }
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.compress),
-                title: const Text('Minify'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
+              Tooltip(
+                message: 'CTRL + i',
+                waitDuration: const Duration(
+                  seconds: 1,
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.compress),
+                  title: const Text('Minify'),
+                  subtitle: currentParsedModel == null
+                      ? const Text('Parse JSON first')
+                      : null,
+                  onTap: currentParsedModel != null
+                      ? () {
+                          Navigator.pop(context);
+                          _tryMinify();
+                        }
+                      : null,
+                ),
               ),
               ListTile(
                 leading: const Icon(Icons.settings),

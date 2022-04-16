@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 enum JsonBuddyShortcut {
   search,
   validateCode,
+  minify,
 }
 
 class ShortCutProvirer {
@@ -13,12 +14,12 @@ class ShortCutProvirer {
     }
   }
 
-  void addSearchListner(
+  void addShortCutListner(
       JsonBuddyShortcut targetShortcut, VoidCallback callback) {
     _shortCuts[targetShortcut]!.add(callback);
   }
 
-  void removeSearchListner(
+  void removeShortCutListner(
       JsonBuddyShortcut targetShortcut, VoidCallback callback) {
     _shortCuts[targetShortcut]!.remove(callback);
   }
