@@ -10,6 +10,7 @@ final en = {
   'search_tooltip': 'Search | CTRL + F',
   'setting_tooltip': 'Settings',
   'setting_title': 'Settings',
+  'export_title': 'Export',
 };
 
 final de = {

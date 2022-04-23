@@ -10,6 +10,7 @@ import 'package:json_buddy/helper/globalization.dart';
 import 'package:json_buddy/helper/json_formater.dart';
 import 'package:json_buddy/helper/short_cut_provider.dart';
 import 'package:json_buddy/controller/json_controller.dart';
+import 'package:json_buddy/widgets/export_dialog.dart';
 import 'package:json_buddy/widgets/line_number_text_field.dart';
 import 'package:json_buddy/widgets/main_menu.dart';
 import 'package:json_buddy/widgets/main_menu_item.dart';
@@ -68,7 +69,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     jsonController = JsonController();
     jsonController.text =
-        '{"name":"John", "age": 30, "car":[123.5,"fast"], "happy":true, "hobby":{"development":true}}';
+        '{"name":"John", "age": 30, "car":[123.5,"fast"], "happy":true, "hobby":{"development":true,"hard":[{"hard":true}]}}';
     filteredTextController = JsonController();
 
     searchController = TextEditingController(text: "\$.*");
@@ -179,6 +180,7 @@ class _MainScreenState extends State<MainScreen> {
                 onTap: currentParsedModel != null
                     ? () {
                         Navigator.pop(context);
+                        _showExportDialog();
                       }
                     : null,
               ),
@@ -198,7 +200,7 @@ class _MainScreenState extends State<MainScreen> {
                 icon: Icons.settings,
                 onTap: () {
                   Navigator.pop(context);
-                  _showMyDialog();
+                  _showSettingDialog();
                 },
               )
             ],
@@ -426,7 +428,27 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  Future<void> _showMyDialog() async {
+  Future<void> _showExportDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            Translation.getText('export_title'),
+          ),
+          content: SizedBox(
+            height: 200,
+            width: 325,
+            child: ExportDialog(
+              currentParsedModel,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showSettingDialog() async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
