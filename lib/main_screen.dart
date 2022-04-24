@@ -202,7 +202,14 @@ class _MainScreenState extends State<MainScreen> {
           onTap: () {
             _showSettingDialog();
           },
-        )
+        ),
+        MainMenuItem(
+          title: 'About',
+          icon: Icons.info_outline_rounded,
+          onTap: () {
+            //TODO add about dialog
+          },
+        ),
       ],
     );
   }
