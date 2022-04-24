@@ -40,8 +40,6 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
 
   ScrollController? _scrollControllerJson;
 
-  ScrollController? _scrollControllerJsonFiltered;
-
   LinkedScrollControllerGroup? _controllers;
 
   int? carretPositionInLine;
@@ -103,7 +101,6 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
 
     _scrollControllerLineNumbers = _controllers?.addAndGet();
     _scrollControllerJson = _controllers?.addAndGet();
-    _scrollControllerJsonFiltered = _controllers?.addAndGet();
   }
 
   // Wrap the codeField in a horizontal scrollView
@@ -269,7 +266,6 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
           TextField(
             readOnly: true,
             controller: widget.filteredTextEditingController,
-            scrollController: _scrollControllerJsonFiltered,
             maxLines: null,
             style: textStyle,
             decoration: const InputDecoration(
