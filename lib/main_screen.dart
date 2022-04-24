@@ -438,13 +438,13 @@ class _MainScreenState extends State<MainScreen> {
       currentParsedModel = decoder.convert(jsonController.text);
       final encoder = JsonEncoder.withIndent(' ' * indent);
       jsonController.text = encoder.convert(currentParsedModel);
-      if (searchModeActive) {
-        _applySearch();
-      }
       jsonController.formatError(null);
       setState(() {
         lastError = null;
       });
+      if (searchModeActive) {
+        _applySearch();
+      }
     } on FormatException catch (ex) {
       currentParsedModel = null;
       jsonController.formatError(ex);
