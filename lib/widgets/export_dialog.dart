@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:json_buddy/helper/theme.dart';
 
 enum ExportFormat { cvs, xml }
 
@@ -79,47 +83,127 @@ class _ExportDialogState extends State<ExportDialog> {
 
   Future _runExport() async {
     if (selectedExport == ExportFormat.cvs) {
-      Map<String, dynamic> jsonModel = widget.currentModel;
-      //Get all JSON keys as path like key-key-key
-      List<String> csvKeys = jsonModel.keys.toList();
-      for (var item in jsonModel.entries) {
-        csvKeys.addAll(_scanForKey(item.value, preFix: item.key));
+      finalCSVKeys.clear();
+      List<String> paths = [];
+      if (widget.currentModel is Map<String, dynamic>) {
+        paths.addAll(getKeysFromObj(widget.currentModel));
+      } else if (widget.currentModel is List<dynamic>) {
+        for (final obj in widget.currentModel) {
+          paths.addAll(getKeysFromObj(obj));
+        }
       }
+
       //Duplicates should not exists, safe is safe
-      csvKeys = csvKeys.toSet().toList();
+      paths = paths.toSet().toList();
+      //Remove parent objects from list
+      _cleanPaths(paths);
+      //We write the CSV keys at the end
       var buffer = StringBuffer();
-      buffer.writeln(csvKeys.join(','));
       if (widget.currentModel is List<dynamic>) {
         for (final obj in widget.currentModel) {
-          _rowForObject(buffer, csvKeys, obj);
+          if (buffer.isNotEmpty) {
+            buffer.writeln();
+          }
+          _rowForObject(buffer, paths, obj);
+          final line = buffer.toString();
+          buffer = StringBuffer(line.substring(0, line.length - 1));
         }
       } else {
-        _rowForObject(buffer, csvKeys, widget.currentModel);
+        _rowForObject(buffer, paths, widget.currentModel);
+        final line = buffer.toString();
+        buffer = StringBuffer(line.substring(0, line.length - 1));
+      }
+      await _saveToFile(finalCSVKeys.toSet().toList().join(csvSeperator) +
+          "\n" +
+          buffer.toString());
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future _saveToFile(String output) async {
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Please select an output file:',
+      fileName: 'my_csv.csv',
+      lockParentWindow: true,
+    );
+    if (outputFile != null) {
+      try {
+        final fileOnDisk = File(outputFile);
+        fileOnDisk.writeAsString(output);
+      } catch (ex) {
+        //TODO refactor, duplicate add generic error snackbar
+        const snackBar = SnackBar(
+          content: Text(
+            'Error saving your file',
+          ),
+          backgroundColor: errorColor,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
   }
 
-  //TODO from here on, see how row can be genrated, idea is that each obj
-  //  gets checked for the path if it exists in the object
+  List<String> getKeysFromObj(Map<String, dynamic> jsonModel) {
+    //Get all JSON keys as path like key-key-key
+    List<String> paths = jsonModel.keys.toList();
+    for (var item in jsonModel.entries) {
+      paths.addAll(_scanForKey(item.value, preFix: item.key));
+    }
+    return paths;
+  }
 
-  void _rowForObject(StringBuffer buffer, List<String> csvKeys, dynamic obj) {
-    for (final key in csvKeys) {
-      _createCsvRow(buffer, key, obj);
+  List<String> finalCSVKeys = [];
+
+  List<String> _cleanPaths(List<String> paths) {
+    final parentObjects = paths
+        .where((element) => element.contains(pathSegmentSign))
+        .map((e) => e.split(pathSegmentSign).first)
+        .toList();
+    paths.removeWhere((element) => parentObjects.contains(element));
+    return paths;
+  }
+
+  void _rowForObject(
+      StringBuffer buffer, List<String> csvKeys, Map<String, dynamic> obj,
+      {String? parent}) {
+    List<String> skipList = [];
+    _cleanPaths(csvKeys);
+    for (final currentPath in csvKeys) {
+      if (skipList.contains(currentPath)) continue;
+
+      if (currentPath.contains(pathSegmentSign)) {
+        final parent = currentPath.split(pathSegmentSign).first;
+        final childPaths = csvKeys
+            .where((element) =>
+                element.contains(pathSegmentSign) && element.startsWith(parent))
+            .toList();
+        skipList.addAll(childPaths);
+        final nextObj = obj[parent];
+        final cleanedPaths = childPaths
+            .map(
+              (e) => e.split(pathSegmentSign).sublist(1).join(pathSegmentSign),
+            )
+            .toList();
+        if (nextObj is List<dynamic>) {
+          finalCSVKeys.add('[${childPaths.join(',')}]');
+          _createValueCSV(buffer, nextObj);
+        } else {
+          _rowForObject(buffer, cleanedPaths, nextObj, parent: parent);
+        }
+      } else {
+        finalCSVKeys.add(parent == null ? currentPath : "$parent-$currentPath");
+        _createValueCSV(buffer, obj[currentPath]);
+      }
     }
   }
 
-  void _createCsvRow(StringBuffer buffer, String path, dynamic obj) {
-    if (path.contains(pathSegmentSign)) {
-    } else {}
-  }
-
-  void _createValueCSV(StringBuffer buffer, dynamic value, bool last) {
-    buffer.write(value);
-    if (last == false) {
-      buffer.write(csvSeperator);
+  void _createValueCSV(StringBuffer buffer, dynamic value) {
+    if (value != null && value is num) {
+      buffer.write(value);
     } else {
-      buffer.writeln();
+      buffer.write('"${value ?? ""}"');
     }
+    buffer.write(csvSeperator);
   }
 
   List<String> _scanForKey(dynamic object, {required String preFix}) {
