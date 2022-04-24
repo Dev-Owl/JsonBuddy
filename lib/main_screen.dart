@@ -148,76 +148,65 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  Widget _getMainMenu() {
+    return MainMenu(
+      menuItems: [
+        MainMenuItem(
+          title: 'Open file',
+          icon: Icons.file_open,
+          toolTipText: 'CTRL + O',
+          onTap: () {
+            _openFile();
+          },
+        ),
+        MainMenuItem(
+          title: 'Save',
+          icon: Icons.save_as,
+          toolTipText: 'CTRL + S',
+          onTap: () {
+            _saveToFile();
+          },
+        ),
+        MainMenuItem(
+          title: 'Export',
+          icon: Icons.import_export,
+          onTap: currentParsedModel != null
+              ? () {
+                  _showExportDialog();
+                }
+              : null,
+        ),
+        MainMenuItem(
+          title: 'Minify',
+          icon: Icons.compress,
+          toolTipText: 'CTRL + i',
+          onTap: currentParsedModel != null
+              ? () {
+                  _tryMinify();
+                }
+              : null,
+        ),
+        MainMenuItem(
+          title: 'Setting',
+          icon: Icons.settings,
+          onTap: () {
+            _showSettingDialog();
+          },
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDesktop = isDesktopSize(context);
     return DropTarget(
       child: Scaffold(
         appBar: _createAppBar(),
-        drawer: Drawer(
-          child: MainMenu(
-            menuItems: [
-              MainMenuItem(
-                title: 'Open file',
-                icon: Icons.file_open,
-                toolTipText: 'CTRL + O',
-                onTap: () {
-                  Navigator.pop(context);
-                  _openFile();
-                },
-              ),
-              MainMenuItem(
-                title: 'Save',
-                icon: Icons.save_as,
-                toolTipText: 'CTRL + S',
-                onTap: () {
-                  Navigator.pop(context);
-                  _saveToFile();
-                },
-              ),
-              MainMenuItem(
-                title: 'Export',
-                icon: Icons.import_export,
-                onTap: currentParsedModel != null
-                    ? () {
-                        Navigator.pop(context);
-                        _showExportDialog();
-                      }
-                    : null,
-              ),
-              MainMenuItem(
-                title: 'Minify',
-                icon: Icons.compress,
-                toolTipText: 'CTRL + i',
-                onTap: currentParsedModel != null
-                    ? () {
-                        Navigator.pop(context);
-                        _tryMinify();
-                      }
-                    : null,
-              ),
-              MainMenuItem(
-                title: 'Setting',
-                icon: Icons.settings,
-                onTap: () {
-                  Navigator.pop(context);
-                  _showSettingDialog();
-                },
-              )
-            ],
-          ),
-        ),
+        drawer: isDesktop ? null : Drawer(child: _getMainMenu()),
         body: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(5),
-              child: LineNumberTextField(
-                filteredTextEditingController: filteredTextController,
-                textEditingController: jsonController,
-                userTextChangeCallback: _userChangedText,
-                currentError: lastError,
-                displayFilterView: searchModeActive,
-              ),
-            ),
+            _buildContent(isDesktop),
             if (draggingActive)
               Align(
                 alignment: Alignment.center,
@@ -280,6 +269,34 @@ class _MainScreenState extends State<MainScreen> {
         });
       },
     );
+  }
+
+  Widget _buildContent(bool isDesktop) {
+    final innerChild = Padding(
+      padding: const EdgeInsets.all(5),
+      child: LineNumberTextField(
+        filteredTextEditingController: filteredTextController,
+        textEditingController: jsonController,
+        userTextChangeCallback: _userChangedText,
+        currentError: lastError,
+        displayFilterView: searchModeActive,
+      ),
+    );
+
+    if (isDesktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: _getMainMenu(),
+            flex: 1,
+          ),
+          Expanded(child: innerChild, flex: 4),
+        ],
+      );
+    } else {
+      return innerChild;
+    }
   }
 
   Future _openFile() async {

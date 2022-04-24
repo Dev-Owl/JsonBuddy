@@ -12,6 +12,7 @@ class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      shrinkWrap: true,
       padding: EdgeInsets.zero,
       children: [
         const MainMenuHeader(),

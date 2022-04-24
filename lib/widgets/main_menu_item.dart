@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:json_buddy/helper/global.dart';
 
 class MainMenuItem extends StatelessWidget {
   final String title;
@@ -31,7 +32,12 @@ class MainMenuItem extends StatelessWidget {
       ListTile(
         leading: Icon(icon),
         title: Text(title),
-        onTap: onTap,
+        onTap: () {
+          if (isDesktopSize(context) == false) {
+            Navigator.of(context).pop();
+          }
+          onTap?.call();
+        },
       ),
     );
   }
