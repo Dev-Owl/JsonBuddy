@@ -61,49 +61,50 @@ class _ExportDialogState extends State<ExportDialog> {
               ExpansionTile(
                 title: const Text('Export settings'),
                 subtitle: const Text('Change details for the exported file'),
-                children: [
-                  ListTile(
-                    title: const Text('CSV Seperator'),
-                    subtitle: TextFormField(
-                      enabled: selectedExport == ExportFormat.cvs,
-                      controller: seperatorTextController,
-                      decoration: const InputDecoration(
-                        helperText: 'Usually ; or ,',
-                      ),
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            value.length > 1) {
-                          return "A single char is required";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('Key Seperator'),
-                    subtitle: TextFormField(
-                      enabled: selectedExport == ExportFormat.cvs,
-                      controller: keySeperatorTextController,
-                      decoration: const InputDecoration(
-                        helperText: "This char can't be part of any JSON key",
-                      ),
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            value.length > 1) {
-                          return "A single char is required";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(
-                      bottom: 40,
-                    ),
-                  ),
-                ],
+                children: selectedExport == ExportFormat.cvs
+                    ? [
+                        ListTile(
+                          title: const Text('CSV Seperator'),
+                          subtitle: TextFormField(
+                            controller: seperatorTextController,
+                            decoration: const InputDecoration(
+                              helperText: 'Usually ; or ,',
+                            ),
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.length > 1) {
+                                return "A single char is required";
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        ListTile(
+                          title: const Text('Key Seperator'),
+                          subtitle: TextFormField(
+                            controller: keySeperatorTextController,
+                            decoration: const InputDecoration(
+                              helperText:
+                                  "This char can't be part of any JSON key",
+                            ),
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.length > 1) {
+                                return "A single char is required";
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(
+                            bottom: 40,
+                          ),
+                        ),
+                      ]
+                    : [const Text('XML has no settings yet')],
               ),
             ],
           ),
@@ -187,6 +188,9 @@ class _ExportDialogState extends State<ExportDialog> {
         );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
+    } else {
+      const snack = SnackBar(content: Text('Soon be available'));
+      ScaffoldMessenger.of(context).showSnackBar(snack);
     }
   }
 
