@@ -17,7 +17,11 @@ class ExportDialog extends StatefulWidget {
 
 class _ExportDialogState extends State<ExportDialog> {
   late ExportFormat selectedExport;
-
+  final seperatorTextController = TextEditingController(text: ";");
+  final keySeperatorTextController = TextEditingController(text: "-");
+  final formKey = GlobalKey<FormState>();
+  var pathSegmentSign = "-";
+  var csvSeperator = ";";
   @override
   void initState() {
     selectedExport = ExportFormat.cvs;
@@ -26,97 +30,146 @@ class _ExportDialogState extends State<ExportDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        ListTile(
-          title: const Text('Export format'),
-          subtitle: DropdownButton<ExportFormat>(
-            value: selectedExport,
-            items: ExportFormat.values
-                .map(
-                  (e) => DropdownMenuItem(
-                    child: Text(e.name.toUpperCase()),
-                    value: e,
-                  ),
-                )
-                .toList(),
-            onChanged: (newValue) {
-              if (newValue != null) {
-                setState(() {
-                  selectedExport = newValue;
-                });
-              }
-            },
-            isExpanded: true,
+    return Form(
+      key: formKey,
+      child: ListView(
+        children: [
+          ListTile(
+            title: const Text('Export format'),
+            subtitle: DropdownButton<ExportFormat>(
+              value: selectedExport,
+              items: ExportFormat.values
+                  .map(
+                    (e) => DropdownMenuItem(
+                      child: Text(e.name.toUpperCase()),
+                      value: e,
+                    ),
+                  )
+                  .toList(),
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    selectedExport = newValue;
+                  });
+                }
+              },
+              isExpanded: true,
+            ),
           ),
-        ),
-        const ListTile(
-          title: Text('Search depth'),
-          subtitle: Text('select the depth'),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                child: const Text('Cancle'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+          ListTile(
+            title: const Text('CSV Seperator'),
+            subtitle: TextFormField(
+              enabled: selectedExport == ExportFormat.cvs,
+              controller: seperatorTextController,
+              decoration: const InputDecoration(
+                helperText: 'Usually ; or ,',
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty || value.length > 1) {
+                  return "A single char is required";
+                }
+                return null;
+              },
             ),
-            const Padding(padding: EdgeInsets.only(left: 10)),
-            Expanded(
-              child: ElevatedButton(
-                child: const Text('Export'),
-                onPressed: () {
-                  //Navigator.of(context).pop();
-                  _runExport();
-                },
+          ),
+          ListTile(
+            title: const Text('Key Seperator'),
+            subtitle: TextFormField(
+              enabled: selectedExport == ExportFormat.cvs,
+              controller: keySeperatorTextController,
+              decoration: const InputDecoration(
+                helperText: "This char can't be part of any JSON key",
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty || value.length > 1) {
+                  return "A single char is required";
+                }
+                return null;
+              },
             ),
-          ],
-        )
-      ],
+          ),
+          const Padding(
+            padding: EdgeInsets.only(
+              top: 10,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  child: const Text('Cancle'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              const Padding(padding: EdgeInsets.only(left: 10)),
+              Expanded(
+                child: ElevatedButton(
+                  child: const Text('Export'),
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      _runExport();
+                    }
+                  },
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 
   Future _runExport() async {
     if (selectedExport == ExportFormat.cvs) {
-      finalCSVKeys.clear();
-      List<String> paths = [];
-      if (widget.currentModel is Map<String, dynamic>) {
-        paths.addAll(getKeysFromObj(widget.currentModel));
-      } else if (widget.currentModel is List<dynamic>) {
-        for (final obj in widget.currentModel) {
-          paths.addAll(getKeysFromObj(obj));
-        }
-      }
-
-      //Duplicates should not exists, safe is safe
-      paths = paths.toSet().toList();
-      //Remove parent objects from list
-      _cleanPaths(paths);
-      //We write the CSV keys at the end
-      var buffer = StringBuffer();
-      if (widget.currentModel is List<dynamic>) {
-        for (final obj in widget.currentModel) {
-          if (buffer.isNotEmpty) {
-            buffer.writeln();
+      pathSegmentSign = keySeperatorTextController.text;
+      pathSegmentSign = keySeperatorTextController.text;
+      try {
+        finalCSVKeys.clear();
+        List<String> paths = [];
+        if (widget.currentModel is Map<String, dynamic>) {
+          paths.addAll(getKeysFromObj(widget.currentModel));
+        } else if (widget.currentModel is List<dynamic>) {
+          for (final obj in widget.currentModel) {
+            paths.addAll(getKeysFromObj(obj));
           }
-          _rowForObject(buffer, paths, obj);
+        }
+
+        //Duplicates should not exists, safe is safe
+        paths = paths.toSet().toList();
+        //Remove parent objects from list
+        _cleanPaths(paths);
+        //We write the CSV keys at the end
+        var buffer = StringBuffer();
+        if (widget.currentModel is List<dynamic>) {
+          for (final obj in widget.currentModel) {
+            if (buffer.isNotEmpty) {
+              buffer.writeln();
+            }
+            _rowForObject(buffer, paths, obj);
+            final line = buffer.toString();
+            buffer = StringBuffer(line.substring(0, line.length - 1));
+          }
+        } else {
+          _rowForObject(buffer, paths, widget.currentModel);
           final line = buffer.toString();
           buffer = StringBuffer(line.substring(0, line.length - 1));
         }
-      } else {
-        _rowForObject(buffer, paths, widget.currentModel);
-        final line = buffer.toString();
-        buffer = StringBuffer(line.substring(0, line.length - 1));
+        await _saveToFile(finalCSVKeys.toSet().toList().join(csvSeperator) +
+            "\n" +
+            buffer.toString());
+        Navigator.of(context).pop();
+      } catch (e) {
+        const snackBar = SnackBar(
+          content: Text(
+            'Unable to export, ensure that the Key Seperator is not used in any JSON key',
+          ),
+          backgroundColor: errorColor,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
-      await _saveToFile(finalCSVKeys.toSet().toList().join(csvSeperator) +
-          "\n" +
-          buffer.toString());
-      Navigator.of(context).pop();
     }
   }
 
@@ -228,8 +281,6 @@ class _ExportDialogState extends State<ExportDialog> {
     return newKeys;
   }
 
-  final pathSegmentSign = "-";
-  final csvSeperator = ";";
   String _buildPath(List<String> segments) {
     return segments.join(pathSegmentSign);
   }

@@ -437,7 +437,7 @@ class _MainScreenState extends State<MainScreen> {
             Translation.getText('export_title'),
           ),
           content: SizedBox(
-            height: 200,
+            height: 325,
             width: 325,
             child: ExportDialog(
               currentParsedModel,
