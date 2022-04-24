@@ -99,6 +99,10 @@ class _MainScreenState extends State<MainScreen> {
       JsonBuddyShortcut.openFile,
       _openFile,
     );
+    GlobalConfig.shortCutProvider.addShortCutListner(
+      JsonBuddyShortcut.exportFile,
+      _showExportDialog,
+    );
   }
 
   void _tryMinify() {
@@ -132,8 +136,12 @@ class _MainScreenState extends State<MainScreen> {
       _saveToFile,
     );
     GlobalConfig.shortCutProvider.removeShortCutListner(
-      JsonBuddyShortcut.saveFile,
+      JsonBuddyShortcut.openFile,
       _openFile,
+    );
+    GlobalConfig.shortCutProvider.removeShortCutListner(
+      JsonBuddyShortcut.exportFile,
+      _showExportDialog,
     );
 
     super.dispose();
@@ -149,6 +157,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _getMainMenu() {
+    final noModelTooltip = Translation.getText('validateJsonFirst');
     return MainMenu(
       menuItems: [
         MainMenuItem(
@@ -170,6 +179,7 @@ class _MainScreenState extends State<MainScreen> {
         MainMenuItem(
           title: 'Export',
           icon: Icons.import_export,
+          toolTipText: currentParsedModel == null ? noModelTooltip : 'CTRL + E',
           onTap: currentParsedModel != null
               ? () {
                   _showExportDialog();
@@ -179,7 +189,7 @@ class _MainScreenState extends State<MainScreen> {
         MainMenuItem(
           title: 'Minify',
           icon: Icons.compress,
-          toolTipText: 'CTRL + i',
+          toolTipText: currentParsedModel == null ? noModelTooltip : 'CTRL + i',
           onTap: currentParsedModel != null
               ? () {
                   _tryMinify();
@@ -382,7 +392,7 @@ class _MainScreenState extends State<MainScreen> {
                   },
             icon: const Icon(Icons.search),
             tooltip: currentParsedModel == null
-                ? Translation.getText('search_tooltip_model_missing')
+                ? Translation.getText('validateJsonFirst')
                 : Translation.getText('search_tooltip'),
           ),
         ),
@@ -446,6 +456,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> _showExportDialog() async {
+    if (currentParsedModel == null) return;
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -454,7 +465,7 @@ class _MainScreenState extends State<MainScreen> {
             Translation.getText('export_title'),
           ),
           content: SizedBox(
-            height: 325,
+            height: 225,
             width: 325,
             child: ExportDialog(
               currentParsedModel,

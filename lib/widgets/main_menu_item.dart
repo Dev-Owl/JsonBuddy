@@ -19,7 +19,7 @@ class MainMenuItem extends StatelessWidget {
     if (toolTipText != null) {
       return Tooltip(
         message: toolTipText,
-        waitDuration: const Duration(seconds: 1),
+        waitDuration: Duration(seconds: onTap == null ? 0 : 1),
         child: child,
       );
     }
@@ -32,12 +32,14 @@ class MainMenuItem extends StatelessWidget {
       ListTile(
         leading: Icon(icon),
         title: Text(title),
-        onTap: () {
-          if (isDesktopSize(context) == false) {
-            Navigator.of(context).pop();
-          }
-          onTap?.call();
-        },
+        onTap: onTap == null
+            ? null
+            : () {
+                if (isDesktopSize(context) == false) {
+                  Navigator.of(context).pop();
+                }
+                onTap!.call();
+              },
       ),
     );
   }

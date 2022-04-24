@@ -77,6 +77,12 @@ class _MyAppState extends State<MyApp> {
         ): () => GlobalConfig.shortCutProvider.triggerShortcut(
               JsonBuddyShortcut.saveFile,
             ),
+        const SingleActivator(
+          LogicalKeyboardKey.keyE,
+          control: true,
+        ): () => GlobalConfig.shortCutProvider.triggerShortcut(
+              JsonBuddyShortcut.exportFile,
+            ),
       },
       child: MaterialApp(
         title: 'JSON Buddy',

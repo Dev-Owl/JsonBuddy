@@ -6,6 +6,7 @@ enum JsonBuddyShortcut {
   minify,
   saveFile,
   openFile,
+  exportFile
 }
 
 class ShortCutProvirer {

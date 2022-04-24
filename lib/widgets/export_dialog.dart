@@ -32,91 +32,108 @@ class _ExportDialogState extends State<ExportDialog> {
   Widget build(BuildContext context) {
     return Form(
       key: formKey,
-      child: ListView(
+      child: Stack(
         children: [
-          ListTile(
-            title: const Text('Export format'),
-            subtitle: DropdownButton<ExportFormat>(
-              value: selectedExport,
-              items: ExportFormat.values
-                  .map(
-                    (e) => DropdownMenuItem(
-                      child: Text(e.name.toUpperCase()),
-                      value: e,
-                    ),
-                  )
-                  .toList(),
-              onChanged: (newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    selectedExport = newValue;
-                  });
-                }
-              },
-              isExpanded: true,
-            ),
-          ),
-          ListTile(
-            title: const Text('CSV Seperator'),
-            subtitle: TextFormField(
-              enabled: selectedExport == ExportFormat.cvs,
-              controller: seperatorTextController,
-              decoration: const InputDecoration(
-                helperText: 'Usually ; or ,',
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty || value.length > 1) {
-                  return "A single char is required";
-                }
-                return null;
-              },
-            ),
-          ),
-          ListTile(
-            title: const Text('Key Seperator'),
-            subtitle: TextFormField(
-              enabled: selectedExport == ExportFormat.cvs,
-              controller: keySeperatorTextController,
-              decoration: const InputDecoration(
-                helperText: "This char can't be part of any JSON key",
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty || value.length > 1) {
-                  return "A single char is required";
-                }
-                return null;
-              },
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(
-              top: 10,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          ListView(
             children: [
-              Expanded(
-                child: ElevatedButton(
-                  child: const Text('Cancle'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-              const Padding(padding: EdgeInsets.only(left: 10)),
-              Expanded(
-                child: ElevatedButton(
-                  child: const Text('Export'),
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      _runExport();
+              ListTile(
+                title: const Text('Export format'),
+                subtitle: DropdownButton<ExportFormat>(
+                  value: selectedExport,
+                  items: ExportFormat.values
+                      .map(
+                        (e) => DropdownMenuItem(
+                          child: Text(e.name.toUpperCase()),
+                          value: e,
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        selectedExport = newValue;
+                      });
                     }
                   },
+                  isExpanded: true,
                 ),
               ),
+              ExpansionTile(
+                title: const Text('Export settings'),
+                subtitle: const Text('Change details for the exported file'),
+                children: [
+                  ListTile(
+                    title: const Text('CSV Seperator'),
+                    subtitle: TextFormField(
+                      enabled: selectedExport == ExportFormat.cvs,
+                      controller: seperatorTextController,
+                      decoration: const InputDecoration(
+                        helperText: 'Usually ; or ,',
+                      ),
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.length > 1) {
+                          return "A single char is required";
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Key Seperator'),
+                    subtitle: TextFormField(
+                      enabled: selectedExport == ExportFormat.cvs,
+                      controller: keySeperatorTextController,
+                      decoration: const InputDecoration(
+                        helperText: "This char can't be part of any JSON key",
+                      ),
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.length > 1) {
+                          return "A single char is required";
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(
+                      bottom: 40,
+                    ),
+                  ),
+                ],
+              ),
             ],
-          )
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    child: const Text('Cancle'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.only(left: 10)),
+                Expanded(
+                  child: ElevatedButton(
+                    child: const Text('Export'),
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        _runExport();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
