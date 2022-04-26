@@ -302,20 +302,17 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
 
-    if (isDesktop) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (isDesktop)
           Expanded(
             child: _getMainMenu(),
             flex: 1,
           ),
-          Expanded(child: innerChild, flex: 4),
-        ],
-      );
-    } else {
-      return innerChild;
-    }
+        Expanded(child: innerChild, flex: 4),
+      ],
+    );
   }
 
   Future _openFile() async {

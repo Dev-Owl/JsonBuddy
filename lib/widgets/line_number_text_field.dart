@@ -56,55 +56,64 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
   }
 
   @override
+  void dispose() {
+    widget.textEditingController.removeListener(handleTextChange);
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
-    _lineNumberController = LineNumberController()..text = "";
-    widget.textEditingController.addListener(() {
-      _lineNumberController!.text = widget.textEditingController.text;
-      final currentOffset = widget.textEditingController.selection.start;
-      if (currentOffset < 0) {
-        if (mounted) {
-          setState(() {
-            carretLine = null;
-            carretPositionInLine = null;
-          });
-        }
-      } else {
-        final source = widget.textEditingController.text;
-        int lineNum = 1;
-        int lineStart = 0;
-        bool previousCharWasCR = false;
-        for (int i = 0; i < currentOffset; i++) {
-          int char = source.codeUnitAt(i);
-          if (char == 0x0a) {
-            if (lineStart != i || !previousCharWasCR) {
-              lineNum++;
-            }
-            lineStart = i + 1;
-            previousCharWasCR = false;
-          } else if (char == 0x0d) {
-            lineNum++;
-            lineStart = i + 1;
-            previousCharWasCR = true;
-          }
-        }
-        carretLine = lineNum;
-        if (mounted) {
-          setState(() {
-            if (lineNum > 1) {
-              carretPositionInLine = currentOffset - lineStart + 1;
-            } else {
-              carretPositionInLine = currentOffset + 1;
-            }
-          });
-        }
-      }
-    });
+    _lineNumberController = LineNumberController()
+      ..text = widget.textEditingController.text;
+    widget.textEditingController.addListener(handleTextChange);
 
     _controllers = LinkedScrollControllerGroup();
 
     _scrollControllerLineNumbers = _controllers?.addAndGet();
     _scrollControllerJson = _controllers?.addAndGet();
+  }
+
+  void handleTextChange() {
+    _lineNumberController!.text = widget.textEditingController.text;
+    final currentOffset = widget.textEditingController.selection.start;
+    if (currentOffset < 0) {
+      if (mounted) {
+        setState(() {
+          carretLine = null;
+          carretPositionInLine = null;
+        });
+      }
+    } else {
+      final source = widget.textEditingController.text;
+      int lineNum = 1;
+      int lineStart = 0;
+      bool previousCharWasCR = false;
+      for (int i = 0; i < currentOffset; i++) {
+        int char = source.codeUnitAt(i);
+        if (char == 0x0a) {
+          if (lineStart != i || !previousCharWasCR) {
+            lineNum++;
+          }
+          lineStart = i + 1;
+          previousCharWasCR = false;
+        } else if (char == 0x0d) {
+          lineNum++;
+          lineStart = i + 1;
+          previousCharWasCR = true;
+        }
+      }
+      carretLine = lineNum;
+      if (mounted) {
+        setState(() {
+          if (lineNum > 1) {
+            carretPositionInLine = currentOffset - lineStart + 1;
+          } else {
+            carretPositionInLine = currentOffset + 1;
+          }
+        });
+      }
+    }
   }
 
   // Wrap the codeField in a horizontal scrollView
