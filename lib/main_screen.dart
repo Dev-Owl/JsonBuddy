@@ -10,6 +10,7 @@ import 'package:json_buddy/helper/globalization.dart';
 import 'package:json_buddy/helper/json_formater.dart';
 import 'package:json_buddy/helper/short_cut_provider.dart';
 import 'package:json_buddy/controller/json_controller.dart';
+import 'package:json_buddy/helper/version.dart';
 import 'package:json_buddy/widgets/export_dialog.dart';
 import 'package:json_buddy/widgets/line_number_text_field.dart';
 import 'package:json_buddy/widgets/main_menu.dart';
@@ -18,6 +19,7 @@ import 'package:json_buddy/widgets/settings_dialog.dart';
 import 'package:json_buddy/helper/theme.dart';
 import 'package:json_path/json_path.dart';
 import 'package:pulse_widget/pulse_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -207,7 +209,7 @@ class _MainScreenState extends State<MainScreen> {
           title: 'About',
           icon: Icons.info_outline_rounded,
           onTap: () {
-            //TODO add about dialog
+            _showAboutDialog();
           },
         ),
       ],
@@ -480,6 +482,46 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
       },
+    );
+  }
+
+  Future<void> _showAboutDialog() async {
+    showAboutDialog(
+      context: context,
+      applicationName: 'JSON Buddy',
+      applicationIcon: const Image(
+        fit: BoxFit.scaleDown,
+        width: 64,
+        height: 64,
+        image: AssetImage('assets/images/logo_128.png'),
+      ),
+      children: [
+        Column(
+          children: [
+            const ListTile(
+              leading: Icon(Icons.api_sharp),
+              title: Text('Version'),
+              subtitle: Text(VersionInfo.versionName),
+            ),
+            ListTile(
+              leading: const Icon(Icons.cloud),
+              title: const Text('Website & Support'),
+              subtitle: const Text(VersionInfo.projectURL),
+              onTap: () {
+                launchUrl(Uri.parse(VersionInfo.projectURL));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.mail),
+              title: const Text('Contact'),
+              subtitle: const Text(VersionInfo.contactMail),
+              onTap: () {
+                launchUrl(Uri.parse("mailto:${VersionInfo.contactMail}"));
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 

@@ -63,10 +63,12 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
       _lineNumberController!.text = widget.textEditingController.text;
       final currentOffset = widget.textEditingController.selection.start;
       if (currentOffset < 0) {
-        setState(() {
-          carretLine = null;
-          carretPositionInLine = null;
-        });
+        if (mounted) {
+          setState(() {
+            carretLine = null;
+            carretPositionInLine = null;
+          });
+        }
       } else {
         final source = widget.textEditingController.text;
         int lineNum = 1;
@@ -87,13 +89,15 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
           }
         }
         carretLine = lineNum;
-        setState(() {
-          if (lineNum > 1) {
-            carretPositionInLine = currentOffset - lineStart + 1;
-          } else {
-            carretPositionInLine = currentOffset + 1;
-          }
-        });
+        if (mounted) {
+          setState(() {
+            if (lineNum > 1) {
+              carretPositionInLine = currentOffset - lineStart + 1;
+            } else {
+              carretPositionInLine = currentOffset + 1;
+            }
+          });
+        }
       }
     });
 
