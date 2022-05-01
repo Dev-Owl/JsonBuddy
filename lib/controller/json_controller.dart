@@ -14,6 +14,10 @@ class JsonController extends TextEditingController {
   JsonController() {
     highlight.registerLanguage('json', json);
   }
+  void clearCache() {
+    _prevText = "";
+    _spanCache = null;
+  }
 
   void formatError(FormatException? ex) {
     _errorPresent = ex;
@@ -55,6 +59,8 @@ class JsonController extends TextEditingController {
       return _spanCache!;
     }
     List<TextSpan> children = [];
+    final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
+    final theme = themeMap[themeToUse];
     if (errorPresent) {
       children.addAll(_tryFormatWithError());
     } else {
@@ -62,20 +68,19 @@ class JsonController extends TextEditingController {
         text,
         language: 'json',
       );
+
       if ((syntaxNodes.relevance ?? 0) > 0) {
-        children = _convert(syntaxNodes.nodes!);
+        children = _convert(syntaxNodes.nodes!, theme);
       } else {
         children.addAll(_tryFormatWithError());
       }
     }
-    _spanCache = TextSpan(
-      children: children,
-    );
+
+    _spanCache = TextSpan(children: children, style: theme!["root"]);
     _prevText = text;
     return _spanCache!;
   }
 
-  //TODO Try to add basic formating rules to the text
   List<TextSpan> _tryFormatWithError() {
     List<TextSpan> children = [];
     final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
@@ -96,11 +101,11 @@ class JsonController extends TextEditingController {
     return children;
   }
 
-  List<TextSpan> _convert(List<Node> nodes) {
+  List<TextSpan> _convert(List<Node> nodes, Map<String, TextStyle>? theme) {
     List<TextSpan> spans = [];
     var currentSpans = spans;
     List<List<TextSpan>> stack = [];
-    final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
+
     _traverse(Node node) {
       if (node.value != null) {
         currentSpans.add(
@@ -108,7 +113,7 @@ class JsonController extends TextEditingController {
               ? TextSpan(text: node.value)
               : TextSpan(
                   text: node.value,
-                  style: themeMap[themeToUse]![node.className!],
+                  style: theme![node.className!],
                 ),
         );
       } else if (node.children != null) {
@@ -116,7 +121,7 @@ class JsonController extends TextEditingController {
         currentSpans.add(
           TextSpan(
             children: tmp,
-            style: themeMap[themeToUse]![node.className!],
+            style: theme![node.className!],
           ),
         );
         stack.add(currentSpans);
