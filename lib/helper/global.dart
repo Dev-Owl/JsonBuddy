@@ -9,6 +9,7 @@ const String settingCodeTheme = "settingCodeTheme";
 const String settingIndent = "settingIndent";
 const String indentChar = " ";
 JsonFormater customJsonFormater = JsonFormater();
+const String defaultFontFamily = "monospace";
 
 class GlobalConfig {
   static final shortCutProvider = ShortCutProvirer();

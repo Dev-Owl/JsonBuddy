@@ -29,7 +29,6 @@ class LineNumberTextField extends StatefulWidget {
 }
 
 class _LineNumberTextFieldState extends State<LineNumberTextField> {
-  static const _defaultFontFamily = 'monospace';
   static const _rootKey = 'root';
   static const _defaultFontColor = Color(0xff000000);
   static const _defaultBackgroundColor = Color(0xffffffff);
@@ -158,11 +157,8 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
   @override
   Widget build(BuildContext context) {
     final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
-    final textStyle = const TextStyle(
-        fontFamily: _defaultFontFamily,
-        color: Colors
-            .pink // themeMap[themeToUse]![_rootKey]?.color ?? _defaultFontColor,
-        );
+    final textStyle = themeMap[themeToUse]![_rootKey]!
+        .copyWith(fontFamily: defaultFontFamily);
     final lineNumberCol = TextField(
       controller: _lineNumberController,
       enabled: false,

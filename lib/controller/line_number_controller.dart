@@ -17,12 +17,14 @@ class LineNumberController extends TextEditingController {
     const themeClassToUse = 'root';
     for (var k = 0; k < list.length; k++) {
       final textSpan = TextSpan(
-          text: '${k + 1}', style: themeMap[themeToUse]![themeClassToUse]);
+        text: '${k + 1}',
+      );
       children.add(textSpan);
       if (k < list.length - 1) children.add(const TextSpan(text: '\n'));
     }
     return TextSpan(
       children: children,
+      style: themeMap[themeToUse]![themeClassToUse],
     );
   }
 }

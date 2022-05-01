@@ -76,7 +76,9 @@ class JsonController extends TextEditingController {
       }
     }
 
-    _spanCache = TextSpan(children: children, style: theme!["root"]);
+    _spanCache = TextSpan(
+        children: children,
+        style: theme!["root"]!.copyWith(fontFamily: defaultFontFamily));
     _prevText = text;
     return _spanCache!;
   }
