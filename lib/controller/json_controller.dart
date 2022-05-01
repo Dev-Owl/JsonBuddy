@@ -7,7 +7,8 @@ import 'package:json_buddy/helper/global.dart';
 class JsonController extends TextEditingController {
   FormatException? _errorPresent;
   int errorLine = 0;
-
+  TextSpan? _spanCache;
+  String _prevText = "";
   bool get errorPresent => _errorPresent != null;
 
   JsonController() {
@@ -50,6 +51,9 @@ class JsonController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
+    if (_prevText == text && _spanCache != null) {
+      return _spanCache!;
+    }
     List<TextSpan> children = [];
     if (errorPresent) {
       children.addAll(_tryFormatWithError());
@@ -64,9 +68,11 @@ class JsonController extends TextEditingController {
         children.addAll(_tryFormatWithError());
       }
     }
-    return TextSpan(
+    _spanCache = TextSpan(
       children: children,
     );
+    _prevText = text;
+    return _spanCache!;
   }
 
   //TODO Try to add basic formating rules to the text
