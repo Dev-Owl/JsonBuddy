@@ -2,7 +2,7 @@ import 'package:json_buddy/helper/global.dart';
 
 final en = {
   'drop_file_message': 'Drop your file to parse it',
-  'parse_JSON': 'Parse JSON | CTRL + Enter',
+  'parse_JSON': 'Parse JSON | CTRL + Space',
   'read_file_error': 'Unable to read the file',
   'search_hint_text': 'Search with use of JsonPath',
   'close_search_tooltip': 'Close search | CTRL + F',
@@ -15,7 +15,7 @@ final en = {
 
 final de = {
   'drop_file_message': 'Datei ablegen, um sie zu parsen',
-  'parse_JSON': 'Parse JSON | STRG + Enter',
+  'parse_JSON': 'Parse JSON | STRG + Leer',
   'read_file_error': 'Die Datei kann nicht gelesen werden',
   'search_hint_text': 'Suche unter Verwendung von JsonPath',
   'close_search_tooltip': 'Suche schließen | STRG + F',

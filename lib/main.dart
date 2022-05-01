@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
               JsonBuddyShortcut.search,
             ),
         const SingleActivator(
-          LogicalKeyboardKey.enter,
+          LogicalKeyboardKey.space,
           control: true,
         ): () => GlobalConfig.shortCutProvider.triggerShortcut(
               JsonBuddyShortcut.validateCode,
