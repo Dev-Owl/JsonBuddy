@@ -10,6 +10,7 @@ class JsonController extends TextEditingController {
   TextSpan? _spanCache;
   String _prevText = "";
   bool get errorPresent => _errorPresent != null;
+  FormatException? get lastError => _errorPresent;
 
   JsonController() {
     highlight.registerLanguage('json', json);
@@ -45,6 +46,7 @@ class JsonController extends TextEditingController {
         }
       }
       errorLine = lineNum;
+      selection = TextSelection.collapsed(offset: offset);
     }
     notifyListeners();
   }

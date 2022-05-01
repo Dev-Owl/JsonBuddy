@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_highlight/theme_map.dart';
+import 'package:json_buddy/controller/json_controller.dart';
 import 'package:json_buddy/helper/global.dart';
 import 'package:json_buddy/controller/line_number_controller.dart';
 import 'package:json_buddy/helper/string_helper.dart';
@@ -10,7 +11,7 @@ import 'package:json_buddy/widgets/syntax_error.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 class LineNumberTextField extends StatefulWidget {
-  final TextEditingController textEditingController;
+  final JsonController textEditingController;
   final FormatException? currentError;
   final bool displayFilterView;
   final TextEditingController filteredTextEditingController;
@@ -68,7 +69,6 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
     widget.textEditingController.addListener(handleTextChange);
 
     _controllers = LinkedScrollControllerGroup();
-
     _scrollControllerLineNumbers = _controllers?.addAndGet();
     _scrollControllerJson = _controllers?.addAndGet();
   }
@@ -232,6 +232,7 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
         return KeyEventResult.ignored;
       },
     );
+
     final jsonField = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         // Control horizontal scrolling
@@ -303,7 +304,6 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
             ],
           )
         : jsonField;
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
