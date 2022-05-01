@@ -439,6 +439,7 @@ class _MainScreenState extends State<MainScreen> {
     const decoder = JsonDecoder();
     showPulse = false;
     try {
+      jsonController.clearCache();
       final indent = prefs.getInt(settingIndent) ?? 2;
       jsonController.text = anyWayFormat.formatText(jsonController.text);
       currentParsedModel = decoder.convert(jsonController.text);
