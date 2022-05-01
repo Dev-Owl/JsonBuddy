@@ -158,10 +158,11 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
   @override
   Widget build(BuildContext context) {
     final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
-    final textStyle = TextStyle(
-      fontFamily: _defaultFontFamily,
-      color: themeMap[themeToUse]![_rootKey]?.color ?? _defaultFontColor,
-    );
+    final textStyle = const TextStyle(
+        fontFamily: _defaultFontFamily,
+        color: Colors
+            .pink // themeMap[themeToUse]![_rootKey]?.color ?? _defaultFontColor,
+        );
     final lineNumberCol = TextField(
       controller: _lineNumberController,
       enabled: false,
