@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const errorColor = Color.fromARGB(255, 216, 54, 76);
 
 final ThemeData jsonBuddyThemeDark = ThemeData(
+  disabledColor: Colors.transparent,
   brightness: Brightness.dark,
   inputDecorationTheme: const InputDecorationTheme(
     focusColor: Colors.white,
@@ -25,6 +26,7 @@ final ThemeData jsonBuddyThemeDark = ThemeData(
 );
 
 final ThemeData jsonBuddyThemeLight = ThemeData(
+  disabledColor: Colors.transparent,
   colorScheme: ColorScheme.light(
     primary: Colors.orange[300]!,
     onPrimary: Colors.black,

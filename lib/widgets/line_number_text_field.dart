@@ -31,7 +31,6 @@ class LineNumberTextField extends StatefulWidget {
 
 class _LineNumberTextFieldState extends State<LineNumberTextField> {
   static const _rootKey = 'root';
-  static const _defaultFontColor = Color(0xff000000);
   static const _defaultBackgroundColor = Color(0xffffffff);
 
   LineNumberController? _lineNumberController;
@@ -74,6 +73,7 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
   }
 
   void handleTextChange() {
+    //Below line will only trigger span creation if text has changed
     _lineNumberController!.text = widget.textEditingController.text;
     final currentOffset = widget.textEditingController.selection.start;
     if (currentOffset < 0) {
@@ -159,16 +159,6 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
     final themeToUse = prefs.getString(settingCodeTheme) ?? 'vs';
     final textStyle = themeMap[themeToUse]![_rootKey]!
         .copyWith(fontFamily: defaultFontFamily);
-    final lineNumberCol = TextField(
-      controller: _lineNumberController,
-      enabled: false,
-      maxLines: null,
-      style: textStyle,
-      scrollController: _scrollControllerLineNumbers,
-      decoration: const InputDecoration(
-        disabledBorder: InputBorder.none,
-      ),
-    );
     final focusNode = FocusNode(
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
@@ -310,7 +300,16 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
         Container(
           width: 50,
           padding: const EdgeInsets.only(left: 3),
-          child: lineNumberCol,
+          child: TextField(
+            controller: _lineNumberController,
+            enabled: false,
+            maxLines: null,
+            style: textStyle,
+            scrollController: _scrollControllerLineNumbers,
+            decoration: const InputDecoration(
+              disabledBorder: InputBorder.none,
+            ),
+          ),
           height: double.infinity,
           decoration: BoxDecoration(
             color: themeMap[themeToUse]![_rootKey]?.backgroundColor ??

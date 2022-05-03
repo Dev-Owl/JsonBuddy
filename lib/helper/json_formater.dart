@@ -6,7 +6,7 @@ class JsonFormater {
   String formatText(String input) {
     final indent = (prefs.getInt(settingIndent) ?? 2);
     final indentToUse = ' ' * indent;
-    var formatedResult = '';
+    var formatedResult = StringBuffer();
     var currentLevel = 0;
     var inQuotes = false;
     var inEscape = false;
@@ -58,12 +58,14 @@ class JsonFormater {
         inEscape = true;
       }
       if (newLineLevel != null) {
-        formatedResult += "\n" + indentToUse * newLineLevel;
+        formatedResult.write("\n");
+        formatedResult.write(indentToUse * newLineLevel);
       }
-      formatedResult += char + post;
+      formatedResult.write(char);
+      formatedResult.write(post);
     }
 
-    return formatedResult.trim();
+    return formatedResult.toString().trimRight();
   }
 
   String minify(dynamic parsedModel) {

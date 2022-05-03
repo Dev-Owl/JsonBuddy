@@ -223,30 +223,7 @@ class _MainScreenState extends State<MainScreen> {
       child: Scaffold(
         appBar: _createAppBar(),
         drawer: isDesktop ? null : Drawer(child: _getMainMenu()),
-        body: Stack(
-          children: [
-            _buildContent(isDesktop),
-            if (draggingActive)
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: 350,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dialogBackgroundColor,
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    Translation.getText('drop_file_message'),
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                ),
-              )
-          ],
-        ),
+        body: _buildContent(isDesktop),
         floatingActionButton: FloatingActionButton(
           tooltip: Translation.getText('parse_JSON'),
           child: Pulse(
@@ -302,17 +279,21 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (isDesktop)
-          Expanded(
-            child: _getMainMenu(),
-            flex: 1,
-          ),
-        Expanded(child: innerChild, flex: 4),
-      ],
-    );
+    if (isDesktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (isDesktop)
+            Expanded(
+              child: _getMainMenu(),
+              flex: 1,
+            ),
+          Expanded(child: innerChild, flex: 4),
+        ],
+      );
+    } else {
+      return innerChild;
+    }
   }
 
   Future _openFile() async {
@@ -441,7 +422,6 @@ class _MainScreenState extends State<MainScreen> {
     try {
       jsonController.clearCache();
       final indent = prefs.getInt(settingIndent) ?? 2;
-      jsonController.text = anyWayFormat.formatText(jsonController.text);
       currentParsedModel = decoder.convert(jsonController.text);
       final encoder = JsonEncoder.withIndent(' ' * indent);
       jsonController.text = encoder.convert(currentParsedModel);
@@ -454,6 +434,7 @@ class _MainScreenState extends State<MainScreen> {
       }
     } on FormatException catch (ex) {
       currentParsedModel = null;
+      jsonController.text = anyWayFormat.formatText(jsonController.text);
       jsonController.formatError(ex);
       _applySearch();
       setState(() {
