@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:json_buddy/editor/editor.dart';
 import 'package:json_buddy/helper/global.dart';
 import 'package:json_buddy/helper/debouncer.dart';
 import 'package:json_buddy/helper/globalization.dart';
@@ -12,7 +13,6 @@ import 'package:json_buddy/helper/short_cut_provider.dart';
 import 'package:json_buddy/controller/json_controller.dart';
 import 'package:json_buddy/helper/version.dart';
 import 'package:json_buddy/widgets/export_dialog.dart';
-import 'package:json_buddy/widgets/line_number_text_field.dart';
 import 'package:json_buddy/widgets/main_menu.dart';
 import 'package:json_buddy/widgets/main_menu_item.dart';
 import 'package:json_buddy/widgets/settings_dialog.dart';
@@ -293,13 +293,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildContent(bool isDesktop) {
     final innerChild = Padding(
       padding: const EdgeInsets.all(5),
-      child: LineNumberTextField(
-        filteredTextEditingController: filteredTextController,
-        textEditingController: jsonController,
-        userTextChangeCallback: _userChangedText,
-        currentError: lastError,
-        displayFilterView: searchModeActive,
-      ),
+      child: Editor(),
     );
 
     return Row(
