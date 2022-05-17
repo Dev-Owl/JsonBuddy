@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:huge_listview/huge_listview.dart';
 import 'package:json_buddy/helper/global.dart';
 import 'package:provider/provider.dart';
 
 import 'document.dart';
 import 'highlighter.dart';
+import 'package:scrollable_positioned_list/src/scrollable_positioned_list.dart';
 
 class DocumentProvider extends ChangeNotifier {
   Document doc = Document();
@@ -73,17 +77,48 @@ class _View extends State<View> {
     super.dispose();
   }
 
+  final int pageSize = 500;
+  final scroll = ItemScrollController();
+  //TODO review the used package, JsonBuddy doesnt need async magic
+  // Check why some linese are shown incorrects
+
   @override
   Widget build(BuildContext context) {
     DocumentProvider doc = Provider.of<DocumentProvider>(context);
+
+    return HugeListView<String>(
+      pageSize: pageSize,
+      startIndex: 0,
+      controller: scroll,
+      totalCount: doc.doc.lines.length,
+      pageFuture: (int page) async {
+        final from = page * pageSize;
+        final to = min(doc.doc.lines.length, from + pageSize);
+        return doc.doc.lines.sublist(from, to);
+      },
+      itemBuilder: (context, index, text) {
+        return ViewLine(
+          lineNumber: index,
+          text: text,
+        );
+      },
+      placeholderBuilder: (context, index) {
+        return ViewLine(
+          lineNumber: index,
+          text: doc.doc.lines[index],
+        );
+      },
+      thumbBuilder: DraggableScrollbarThumbs.ArrowThumb,
+    );
     return ListView.builder(
-        controller: scroller,
-        itemCount: doc.doc.lines.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ViewLine(
-            lineNumber: index,
-            text: doc.doc.lines[index],
-          );
-        });
+      controller: scroller,
+      itemCount: doc.doc.lines.length,
+      itemBuilder: (BuildContext context, int index) {
+        return ViewLine(
+          lineNumber: index,
+          text: doc.doc.lines[index],
+        );
+      },
+    );
   }
 }
