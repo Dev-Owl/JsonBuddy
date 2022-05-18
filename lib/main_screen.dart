@@ -291,10 +291,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildContent(bool isDesktop) {
-    final innerChild = Padding(
-      padding: const EdgeInsets.all(5),
-      child: Editor(),
-    );
+    final innerChild = Editor();
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
