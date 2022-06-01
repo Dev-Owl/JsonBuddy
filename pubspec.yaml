@@ -33,15 +33,15 @@ dependencies:
     sdk: flutter
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
+  huge_listview: ^2.0.3
   intl: ^0.17.0
   json_path: ^0.4.0
+  provider: ^6.0.2
   pulse_widget: ^0.0.2
   shared_preferences: ^2.0.13
   url_launcher: ^6.1.0
-  provider: ^6.0.2
-  huge_listview: 
-   git: https://github.com/Dev-Owl/huge_listview.git
-
+# huge_listview:
+#  git: https://github.com/Dev-Owl/huge_listview.git
 dev_dependencies:
   flutter_lints: ^1.0.4
   flutter_test:
@@ -70,9 +70,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-      - family: MonospaceTypewriter
-        fonts:
-          - asset: fonts/MonospaceTypewriter.ttf
+    - family: MonospaceTypewriter
+      fonts:
+        - asset: fonts/MonospaceTypewriter.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

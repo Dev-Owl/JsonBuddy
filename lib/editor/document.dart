@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 
@@ -45,6 +46,7 @@ class Document {
   List<String> lines = <String>[''];
   Cursor cursor = Cursor();
   String clipboardText = '';
+  int maxLineLength = 0;
 
   Future<bool> openFile(String path) async {
     lines = <String>[''];
@@ -160,7 +162,7 @@ class Document {
     String l = lines[cursor.line];
     String left = l.substring(0, cursor.column);
     String right = l.substring(cursor.column);
-
+    maxLineLength = max(maxLineLength, text.length);
     // handle new line
     if (text == '\n') {
       lines[cursor.line] = left;

@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:huge_listview/huge_listview.dart';
 import 'package:json_buddy/helper/global.dart';
 import 'package:provider/provider.dart';
 
@@ -44,8 +41,12 @@ class ViewLine extends StatelessWidget {
 
     return Stack(children: [
       Padding(
-          padding: EdgeInsets.only(left: gutterWidth),
-          child: RichText(text: TextSpan(children: spans), softWrap: false)),
+        padding: EdgeInsets.only(left: gutterWidth),
+        child: RichText(
+          text: TextSpan(children: spans),
+          softWrap: false,
+        ),
+      ),
       Container(
           width: gutterWidth,
           alignment: Alignment.centerRight,
@@ -86,7 +87,7 @@ class _View extends State<View> {
   Widget build(BuildContext context) {
     DocumentProvider doc = Provider.of<DocumentProvider>(context);
 
-    return HugeListView<String>(
+    /*return HugeListView<String>(
       pageSize: pageSize,
       startIndex: 0,
       controller: scroll,
@@ -110,6 +111,7 @@ class _View extends State<View> {
       },
       thumbBuilder: DraggableScrollbarThumbs.ArrowThumb,
     );
+    */
     return ListView.builder(
       controller: scroller,
       itemCount: doc.doc.lines.length,
