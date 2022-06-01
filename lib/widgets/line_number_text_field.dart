@@ -8,7 +8,6 @@ import 'package:json_buddy/helper/global.dart';
 import 'package:json_buddy/controller/line_number_controller.dart';
 import 'package:json_buddy/helper/string_helper.dart';
 import 'package:json_buddy/widgets/syntax_error.dart';
-import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 class LineNumberTextField extends StatefulWidget {
   final JsonController textEditingController;
@@ -40,8 +39,6 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
 
   ScrollController? _scrollControllerJson;
 
-  LinkedScrollControllerGroup? _controllers;
-
   int? carretPositionInLine;
   int? carretLine;
 
@@ -68,9 +65,9 @@ class _LineNumberTextFieldState extends State<LineNumberTextField> {
       ..text = widget.textEditingController.text;
     widget.textEditingController.addListener(handleTextChange);
 
-    _controllers = LinkedScrollControllerGroup();
+    /*_controllers = LinkedScrollControllerGroup();
     _scrollControllerLineNumbers = _controllers?.addAndGet();
-    _scrollControllerJson = _controllers?.addAndGet();
+    _scrollControllerJson = _controllers?.addAndGet();*/
   }
 
   void handleTextChange() {
