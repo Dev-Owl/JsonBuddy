@@ -1,10 +1,5 @@
 # JsonBudy
-Simple cross-platform application to validate and pretty print JSON
 
-## Planned featuers
+The amount of work (not related to the actual idea of a nice, small JSON tool) to get bigger JSON files to work with Flutter showed up to much and not what I was looking for.
 
-* Validate JSON
-    * Show error with line number and message
-* Pretty print JSON
-* Filter JSON with JSON path or similiar
-* Copy to clipboard
+Still keeping it here for reference
